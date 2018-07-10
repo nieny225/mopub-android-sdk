@@ -2,8 +2,12 @@ package com.mopub.nativeads;
 
 import android.app.Activity;
 
+import com.mopub.common.MoPub;
+import com.mopub.common.SdkConfiguration;
 import com.mopub.common.logging.MoPubLog;
+import com.mopub.common.privacy.MoPubIdentifierTest;
 import com.mopub.common.test.support.SdkTestRunner;
+import com.mopub.common.util.Reflection;
 import com.mopub.common.util.test.support.ShadowAsyncTasks;
 import com.mopub.common.util.test.support.TestMethodBuilderFactory;
 import com.mopub.mobileads.BuildConfig;
@@ -60,8 +64,10 @@ public class MoPubNativeTest {
     @Mock private MoPubStaticNativeAdRenderer mockRenderer;
 
     @Before
-    public void setup() {
+    public void setup() throws Exception {
         context = Robolectric.buildActivity(Activity.class).create().get();
+        MoPub.initializeSdk(context, new SdkConfiguration.Builder("adunit").build(), null);
+        MoPubIdentifierTest.writeAdvertisingInfoToSharedPreferences(context, false);
         Shadows.shadowOf(context).grantPermissions(ACCESS_NETWORK_STATE);
         Shadows.shadowOf(context).grantPermissions(INTERNET);
         subject = new MoPubNative(context, adUnitId, mockAdRendererRegistry, mockNetworkListener);
@@ -70,8 +76,13 @@ public class MoPubNativeTest {
     }
 
     @After
-    public void tearDown() {
+    public void tearDown() throws Exception {
+        MoPubIdentifierTest.clearPreferences(context);
         reset(methodBuilder);
+        new Reflection.MethodBuilder(null, "clearAdvancedBidders")
+                .setStatic(MoPub.class)
+                .setAccessible()
+                .execute();
     }
 
     @Test

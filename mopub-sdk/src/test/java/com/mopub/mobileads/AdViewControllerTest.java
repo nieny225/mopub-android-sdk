@@ -3,15 +3,25 @@ package com.mopub.mobileads;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
+import android.location.Location;
 import android.net.ConnectivityManager;
+import android.net.Uri;
+import android.telephony.TelephonyManager;
+import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.FrameLayout;
 
 import com.mopub.common.AdFormat;
+import com.mopub.common.MoPub;
+import com.mopub.common.SdkConfiguration;
+import com.mopub.common.privacy.ConsentStatus;
+import com.mopub.common.privacy.PersonalInfoManager;
 import com.mopub.common.test.support.SdkTestRunner;
 import com.mopub.common.util.Reflection;
 import com.mopub.common.util.test.support.TestMethodBuilderFactory;
+import com.mopub.mobileads.test.support.MoPubShadowConnectivityManager;
+import com.mopub.mobileads.test.support.MoPubShadowTelephonyManager;
 import com.mopub.mobileads.test.support.ThreadUtils;
 import com.mopub.network.AdRequest;
 import com.mopub.network.AdResponse;
@@ -56,7 +66,7 @@ import static org.mockito.Mockito.when;
 
 
 @RunWith(SdkTestRunner.class)
-@Config(constants = BuildConfig.class)
+@Config(constants = BuildConfig.class, shadows = {MoPubShadowTelephonyManager.class, MoPubShadowConnectivityManager.class})
 public class AdViewControllerTest {
 
     private static final int[] HTML_ERROR_CODES = new int[]{400, 401, 402, 403, 404, 405, 407, 408,
@@ -66,14 +76,28 @@ public class AdViewControllerTest {
     @Mock private MoPubView mockMoPubView;
     @Mock private MoPubRequestQueue mockRequestQueue;
     private Reflection.MethodBuilder methodBuilder;
+    private MoPubShadowTelephonyManager shadowTelephonyManager;
+    private MoPubShadowConnectivityManager shadowConnectivityManager;
 
     private AdResponse response;
     private Activity activity;
 
+    private PersonalInfoManager mockPersonalInfoManager;
+
     @Before
-    public void setup() {
+    public void setup() throws Exception {
         activity = Robolectric.buildActivity(Activity.class).create().get();
         Shadows.shadowOf(activity).grantPermissions(android.Manifest.permission.ACCESS_NETWORK_STATE);
+
+        MoPub.initializeSdk(activity, new SdkConfiguration.Builder("adunit").build(), null);
+
+        mockPersonalInfoManager = mock(PersonalInfoManager.class);
+        when(mockPersonalInfoManager.getPersonalInfoConsentStatus()).thenReturn(ConsentStatus.UNKNOWN);
+        new Reflection.MethodBuilder(null, "setPersonalInfoManager")
+                .setStatic(MoPub.class)
+                .setAccessible()
+                .addParam(PersonalInfoManager.class, mockPersonalInfoManager)
+                .execute();
 
         when(mockMoPubView.getAdFormat()).thenReturn(AdFormat.BANNER);
         when(mockMoPubView.getContext()).thenReturn(activity);
@@ -95,11 +119,17 @@ public class AdViewControllerTest {
                 .setResponseBody("testResponseBody")
                 .setServerExtras(Collections.<String, String>emptyMap())
                 .build();
+        shadowTelephonyManager = (MoPubShadowTelephonyManager) Shadows.shadowOf((TelephonyManager) RuntimeEnvironment.application.getSystemService(Context.TELEPHONY_SERVICE));
+        shadowConnectivityManager = (MoPubShadowConnectivityManager) Shadows.shadowOf((ConnectivityManager) RuntimeEnvironment.application.getSystemService(Context.CONNECTIVITY_SERVICE));
     }
 
     @After
     public void tearDown() throws Exception {
         reset(methodBuilder);
+        new Reflection.MethodBuilder(null, "clearAdvancedBidders")
+                .setStatic(MoPub.class)
+                .setAccessible()
+                .execute();
     }
 
     @Test
@@ -108,6 +138,57 @@ public class AdViewControllerTest {
 
         assertThat(subject.getMoPubView()).isNull();
         assertThat(subject.generateAdUrl()).isNull();
+    }
+
+    @Test
+    public void setUserDataKeywords_shouldNotSetKeywordIfNoUserConsent() throws Exception {
+        when(mockPersonalInfoManager.canCollectPersonalInformation()).thenReturn(false);
+
+        subject.setUserDataKeywords("user_data_keywords");
+
+        assertThat(subject.getUserDataKeywords()).isNull();
+    }
+
+    @Test
+    public void setUserDataKeywords_shouldSetUserDataKeywordsIfUserConsent() throws Exception {
+        when(mockPersonalInfoManager.canCollectPersonalInformation()).thenReturn(true);
+
+        subject.setUserDataKeywords("user_data_keywords");
+
+        assertThat(subject.getUserDataKeywords()).isEqualTo("user_data_keywords");
+    }
+
+
+    @Test
+    public void generateAdUrl_shouldNotSetUserDataKeywordsIfNoUserConsent() throws Exception {
+        when(mockPersonalInfoManager.canCollectPersonalInformation()).thenReturn(false);
+
+        subject.setAdUnitId("abc123");
+        subject.setKeywords("keywords");
+        subject.setUserDataKeywords("user_data_keywords");
+        subject.setLocation(new Location(""));
+        WebViewAdUrlGenerator mUrlGenerator = new WebViewAdUrlGenerator(mockMoPubView.getContext(), false);
+
+        final String adUrl = subject.generateAdUrl();
+        assertThat(getParameterFromRequestUrl(adUrl, "q")).isEqualTo("keywords");
+        assertThat(getParameterFromRequestUrl(adUrl, "user_data_keyword_q")).isEqualTo("");
+    }
+
+    @Test
+    public void generateAdUrl_shouldSetUserDataKeywordsIfUserConsent() throws Exception {
+        when(mockPersonalInfoManager.canCollectPersonalInformation()).thenReturn(true);
+        when(mockPersonalInfoManager.getPersonalInfoConsentStatus()).thenReturn(
+                ConsentStatus.EXPLICIT_YES);
+
+        subject.setAdUnitId("abc123");
+        subject.setKeywords("keywords");
+        subject.setUserDataKeywords("user_data_keywords");
+        subject.setLocation(new Location(""));
+        WebViewAdUrlGenerator mUrlGenerator = new WebViewAdUrlGenerator(mockMoPubView.getContext(), false);
+
+        final String adUrl = subject.generateAdUrl();
+        assertThat(getParameterFromRequestUrl(adUrl, "q")).isEqualTo("keywords");
+        assertThat(getParameterFromRequestUrl(adUrl, "user_data_q")).isEqualTo("user_data_keywords");
     }
 
     @Test
@@ -676,5 +757,16 @@ public class AdViewControllerTest {
                 networkError, activity);
 
         assertThat(errorCode).isEqualTo(MoPubErrorCode.UNSPECIFIED);
+    }
+
+    private String getParameterFromRequestUrl(String requestString, String key) {
+        Uri requestUri = Uri.parse(requestString);
+        String parameter = requestUri.getQueryParameter(key);
+
+        if (TextUtils.isEmpty(parameter)) {
+            return "";
+        }
+
+        return parameter;
     }
 }

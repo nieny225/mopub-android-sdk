@@ -39,7 +39,7 @@ The MoPub SDK is available via:
     }
 
     dependencies {
-        compile('com.mopub:mopub-sdk:4.19.0@aar') {
+        implementation('com.mopub:mopub-sdk:5.2.0@aar') {
             transitive = true
         }
     }
@@ -61,27 +61,27 @@ The MoPub SDK is available via:
         // ... other project dependencies
 
         // For banners
-        compile('com.mopub:mopub-sdk-banner:4.19.0@aar') {
+        implementation('com.mopub:mopub-sdk-banner:5.2.0@aar') {
             transitive = true
         }
         
         // For interstitials
-        compile('com.mopub:mopub-sdk-interstitial:4.19.0@aar') {
+        implementation('com.mopub:mopub-sdk-interstitial:5.2.0@aar') {
             transitive = true
         }
 
         // For rewarded videos. This will automatically also include interstitials
-        compile('com.mopub:mopub-sdk-rewardedvideo:4.19.0@aar') {
+        implementation('com.mopub:mopub-sdk-rewardedvideo:5.2.0@aar') {
             transitive = true
         }
 
         // For native static (images).
-        compile('com.mopub:mopub-sdk-native-static:4.19.0@aar') {
+        implementation('com.mopub:mopub-sdk-native-static:5.2.0@aar') {
             transitive = true
         }
 
         // For native video. This will automatically also include native static
-        compile('com.mopub:mopub-sdk-native-video:4.19.0@aar') {
+        implementation('com.mopub:mopub-sdk-native-video:5.2.0@aar') {
             transitive = true
         }
     }
@@ -109,9 +109,8 @@ The MoPub SDK is available via:
 ## New in this Version
 Please view the [changelog](https://github.com/mopub/mopub-android-sdk/blob/master/CHANGELOG.md) for a complete list of additions, fixes, and enhancements in the latest release.
 
-- Updated Facebook Audience Network adapters to 4.26.1.
-- Updated Flurry adapters to 8.1.0.
-- Updated Millennial rewarded ads adapters to 6.6.1.
+- SDK initialization is required for ads to load. Ad requests will fail unless MoPub is initialized.
+- `MoPub#isSdkInitialized()` now more accurately reflects whether or not MoPub is initialized. This method now returns true after the `SdkInitializationListener#onInitializationFinished()` callback instead of immediately.
 
 ## Requirements
 
@@ -119,8 +118,14 @@ Please view the [changelog](https://github.com/mopub/mopub-android-sdk/blob/mast
 - android-support-v4.jar, r26 (**Updated in 4.18.0**)
 - android-support-annotations.jar, r26 (**Updated in 4.18.0**)
 - android-support-v7-recyclerview.jar, r26 (**Updated in 4.18.0**)
-- MoPub Volley Library (mopub-volley-1.1.0.jar - available on JCenter) (**Updated in 3.6.0**)
+- MoPub Volley Library (mopub-volley-2.0.0.jar - available on JCenter) (**Updated in 5.0.0**)
 - **Recommended** Google Play Services 11.4.0
+
+## Upgrading to SDK 5.0
+
+Please see the [Getting Started Guide](https://developers.mopub.com/docs/android/getting-started/) for instructions on upgrading from SDK 4.X to SDK 5.0.
+
+For GDPR-specific upgrading instructions, also see the [GDPR Integration Guide](https://developers.mopub.com/docs/publisher/gdpr).
 
 ## <a name="upgradeRepositoryViewability"></a>Upgrading from 4.15.0 and Prior
 In 4.16.0, dependencies were added to viewability libraries provided by AVID and Moat. Apps upgrading from previous versions must add
@@ -134,7 +139,7 @@ Normally, to add the MoPub SDK to your app via JCenter, your `build.gradle` woul
 
 ```	
 dependencies {
-    compile('com.mopub:mopub-sdk:4.18.0@aar') {
+    implementation('com.mopub:mopub-sdk:5.2.0@aar') {
         transitive = true
     }
 }
@@ -143,7 +148,7 @@ Update to the following to exclude one or both viewability vendors:
 
 ```
 dependencies {
-    compile('com.mopub:mopub-sdk:4.19.0@aar') {
+    implementation('com.mopub:mopub-sdk:5.2.0@aar') {
         transitive = true
         exclude module: 'libAvid-mopub' // To exclude AVID
         exclude module: 'moat-mobile-app-kit' // To exclude Moat
