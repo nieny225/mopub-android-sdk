@@ -15,6 +15,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.mopub.nativeads.AdapterHelper;
+import com.mopub.nativeads.GooglePlayServicesAdRenderer;
 import com.mopub.nativeads.MediaViewBinder;
 import com.mopub.nativeads.MoPubAdRenderer;
 import com.mopub.nativeads.MoPubNative;
@@ -111,31 +112,38 @@ public class NativeDetailFragment extends Fragment {
             }
         });
 
+        ViewBinder staticViewBinder = new ViewBinder.Builder(R.layout.native_ad_list_item)
+                .titleId(R.id.native_title)
+                .textId(R.id.native_text)
+                .mainImageId(R.id.native_main_image)
+                .iconImageId(R.id.native_icon_image)
+                .callToActionId(R.id.native_cta)
+                .privacyInformationIconImageId(R.id.native_privacy_information_icon_image)
+                .build();
+
+        MediaViewBinder videoViewBinder = new MediaViewBinder.Builder(R.layout.video_ad_list_item)
+                .titleId(R.id.native_title)
+                .textId(R.id.native_text)
+                .mediaLayoutId(R.id.native_media_layout)
+                .iconImageId(R.id.native_icon_image)
+                .callToActionId(R.id.native_cta)
+                .privacyInformationIconImageId(R.id.native_privacy_information_icon_image)
+                .build();
+
         // Set up a renderer for a static native ad.
-        final MoPubStaticNativeAdRenderer moPubStaticNativeAdRenderer = new MoPubStaticNativeAdRenderer(
-                new ViewBinder.Builder(R.layout.native_ad_list_item)
-                        .titleId(R.id.native_title)
-                        .textId(R.id.native_text)
-                        .mainImageId(R.id.native_main_image)
-                        .iconImageId(R.id.native_icon_image)
-                        .callToActionId(R.id.native_cta)
-                        .privacyInformationIconImageId(R.id.native_privacy_information_icon_image)
-                        .build()
-        );
+        final MoPubStaticNativeAdRenderer moPubStaticNativeAdRenderer = new MoPubStaticNativeAdRenderer(staticViewBinder);
 
         // Set up a renderer for a video native ad.
-        final MoPubVideoNativeAdRenderer moPubVideoNativeAdRenderer = new MoPubVideoNativeAdRenderer(
-                new MediaViewBinder.Builder(R.layout.video_ad_list_item)
-                        .titleId(R.id.native_title)
-                        .textId(R.id.native_text)
-                        .mediaLayoutId(R.id.native_media_layout)
-                        .iconImageId(R.id.native_icon_image)
-                        .callToActionId(R.id.native_cta)
-                        .privacyInformationIconImageId(R.id.native_privacy_information_icon_image)
-                        .build());
+        final MoPubVideoNativeAdRenderer moPubVideoNativeAdRenderer = new MoPubVideoNativeAdRenderer(videoViewBinder);
+
+        final GooglePlayServicesAdRenderer googlePlayServicesAdRenderer = new GooglePlayServicesAdRenderer(staticViewBinder);
+
+//        final FacebookAdRenderer facebookAdRenderer = new FacebookAdRenderer(staticViewBinder);
 
         moPubNative.registerAdRenderer(moPubStaticNativeAdRenderer);
         moPubNative.registerAdRenderer(moPubVideoNativeAdRenderer);
+        moPubNative.registerAdRenderer(googlePlayServicesAdRenderer);
+//        moPubNative.registerAdRenderer(facebookAdRenderer);
 
         adapterHelper = new AdapterHelper(getActivity(), 0, 3); // When standalone, any range will be fine.
 
