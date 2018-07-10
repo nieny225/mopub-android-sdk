@@ -4,7 +4,7 @@ repositories {
     flatDir {
         dirs '../libs'
     }
-    maven { url "https://s3.amazonaws.com/moat-sdk-builds" }
+//    maven { url "https://s3.amazonaws.com/moat-sdk-builds" }
 }
 
 apply plugin: 'com.android.application'
@@ -15,7 +15,7 @@ project.version = '5.2.0'
 
 android {
     compileSdkVersion 26
-    buildToolsVersion '26.0.2'
+//    buildToolsVersion '26.0.2'
     lintOptions { abortOnError false }
 
     defaultConfig {
@@ -54,20 +54,13 @@ android {
     // way that the existing SDK requires, using the sdk.dir property.
     // Alternatively, you can set an environment variable called ANDROID_HOME. There is no 
     // difference between the two methods, you can use the one you prefer.
+    buildToolsVersion '27.0.3'
 }
 
 dependencies {
-<<<<<<< HEAD
-    compile 'com.android.support:support-v4:26.1.0'
-    compile 'com.google.android.gms:play-services-ads:11.4.0'
-    compile 'com.facebook.android:audience-network-sdk:4.26.1'
-    compile 'com.android.support:recyclerview-v7:26.1.0'
-    compile project(':mopub-sdk')
-=======
     implementation 'com.android.support:support-v4:26.1.0'
     implementation 'com.google.android.gms:play-services-ads:11.4.0'
     implementation 'com.google.android.gms:play-services-base:11.4.0'
     implementation 'com.android.support:recyclerview-v7:26.1.0'
     implementation project(':mopub-sdk')
->>>>>>> upstream/master
 }

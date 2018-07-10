@@ -6,7 +6,7 @@ repositories {
     flatDir {
         dirs project(':mopub-sdk').file('../libs')
     }
-    maven { url "https://s3.amazonaws.com/moat-sdk-builds" }
+//    maven { url "https://s3.amazonaws.com/moat-sdk-builds" }
 }
 
 project.group = 'com.mopub'
