@@ -108,11 +108,11 @@ public class TrackingRequest extends MoPubRequest<Void> {
             if (TextUtils.isEmpty(url)) {
                 continue;
             }
-
+            final String originalUrl = url;
             final TrackingRequest.Listener internalListener = new TrackingRequest.Listener() {
                 @Override
                 public void onResponse(@NonNull String url) {
-                    MoPubLog.d("Successfully hit tracking endpoint: " + url);
+                    MoPubLog.d("Successfully hit tracking endpoint: " + originalUrl);
                     if (listener != null) {
                         listener.onResponse(url);
                     }
@@ -120,7 +120,7 @@ public class TrackingRequest extends MoPubRequest<Void> {
 
                 @Override
                 public void onErrorResponse(final VolleyError volleyError) {
-                    MoPubLog.d("Failed to hit tracking endpoint: " + url);
+                    MoPubLog.d("Failed to hit tracking endpoint: " + originalUrl);
                     if (listener != null) {
                         listener.onErrorResponse(volleyError);
                     }
