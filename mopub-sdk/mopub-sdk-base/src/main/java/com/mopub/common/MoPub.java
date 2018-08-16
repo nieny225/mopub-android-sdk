@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import com.mopub.common.logging.MoPubLog;
 import com.mopub.common.privacy.PersonalInfoManager;
@@ -155,7 +156,7 @@ public class MoPub {
             @Nullable final SdkInitializationListener sdkInitializationListener) {
         Preconditions.checkNotNull(context);
         Preconditions.checkNotNull(sdkConfiguration);
-
+        Log.d("MoPub-Nick", "MoPub.initializeSdk(): Start SDK initialization");
         // This also initializes MoPubLog
         MoPubLog.d("Initializing MoPub with ad unit: " + sdkConfiguration.getAdUnitId());
 
@@ -163,7 +164,7 @@ public class MoPub {
             final Activity activity = (Activity) context;
             initializeRewardedVideo(activity, sdkConfiguration);
         }
-
+        Log.d("MoPub-Nick", "sSdkInitialized: "+ sSdkInitialized);
         if (sSdkInitialized) {
             MoPubLog.d("MoPub SDK is already initialized");
             return;

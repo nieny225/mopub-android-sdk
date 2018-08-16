@@ -8,6 +8,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 import android.webkit.WebView;
 
 import com.mopub.common.MoPub;
@@ -54,6 +55,7 @@ public class MoPubSampleActivity extends FragmentActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d("MoPub-Nick", "onCreate()");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
 
@@ -92,6 +94,7 @@ public class MoPubSampleActivity extends FragmentActivity {
         LoggingUtils.enableCanaryLogging(this);
     }
 
+
     private void createMoPubListFragment(@NonNull final Intent intent) {
         if (findViewById(R.id.fragment_container) != null) {
             mMoPubListFragment = new MoPubListFragment();
@@ -123,6 +126,7 @@ public class MoPubSampleActivity extends FragmentActivity {
             @Override
             public void onInitializationFinished() {
                 Utils.logToast(MoPubSampleActivity.this, "SDK initialized.");
+                Log.d("MoPub-Nick", "onInitializationFinished(): SDK initialized");
                 if (mPersonalInfoManager != null && mPersonalInfoManager.shouldShowConsentDialog()) {
                     mPersonalInfoManager.loadConsentDialog(initDialogLoadListener());
                 }
