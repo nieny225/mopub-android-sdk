@@ -19,3 +19,6 @@ proguard_logs/
 target/
 tmp/
 
+mopub-sample/res/layout/native_gallery_content.xml
+mopub-sample/res/layout/native_gallery_content.xml
+mopub-sample/res/layout/native_gallery_content.xml
