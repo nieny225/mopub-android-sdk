@@ -16,12 +16,7 @@ project.description = '''MoPub Sample App'''
 project.version = '5.3.0'
 
 android {
-<<<<<<< HEAD
-    compileSdkVersion 26
-//    buildToolsVersion '26.0.2'
-=======
     compileSdkVersion 27
->>>>>>> upstream/master
     lintOptions { abortOnError false }
 
     defaultConfig {
@@ -64,17 +59,12 @@ android {
 }
 
 dependencies {
-<<<<<<< HEAD
-    implementation 'com.android.support:support-v4:26.1.0'
-    implementation 'com.google.android.gms:play-services-base:15.0.0'
-    implementation 'com.android.support:recyclerview-v7:26.1.0'
-=======
     implementation 'com.android.support:customtabs:27.1.1'
     implementation 'com.android.support:support-v4:27.1.1'
     implementation 'com.google.android.gms:play-services-ads:15.0.1'
     implementation 'com.google.android.gms:play-services-base:15.0.1'
     implementation 'com.android.support:recyclerview-v7:27.1.1'
->>>>>>> upstream/master
+
     implementation project(':mopub-sdk')
 
     // AppLovin
@@ -82,7 +72,7 @@ dependencies {
     implementation 'com.mopub.mediation:applovin:8.0.1.0'
 
     // Google (AdMob)
-    implementation 'com.google.android.gms:play-services-ads:15.0.0'
+//    implementation 'com.google.android.gms:play-services-ads:15.0.0'
     implementation 'com.mopub.mediation:admob:15.0.0.8'
 
     // Facebook Audience Network
