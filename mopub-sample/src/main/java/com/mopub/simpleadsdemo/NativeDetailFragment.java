@@ -14,6 +14,9 @@ import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.mopub.common.MoPub;
+import com.mopub.common.SdkConfiguration;
+import com.mopub.mobileads.FacebookAdvancedBidder;
 import com.mopub.nativeads.AdapterHelper;
 import com.mopub.nativeads.GooglePlayServicesAdRenderer;
 import com.mopub.nativeads.MediaViewBinder;
@@ -35,6 +38,7 @@ import static com.mopub.nativeads.RequestParameters.NativeAdAsset;
 public class NativeDetailFragment extends Fragment {
     private MoPubSampleAdUnit mAdConfiguration;
     private MoPubNative moPubNative;
+    private static boolean sNativeInitialized;
 
     private AdapterHelper adapterHelper;
     private RequestParameters mRequestParameters;
@@ -43,6 +47,14 @@ public class NativeDetailFragment extends Fragment {
     @Override
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
             final Bundle savedInstanceState) {
+
+        if (!sNativeInitialized) {
+            MoPub.initializeSdk(getActivity(), new SdkConfiguration.Builder(
+                    "91e4e8af17214dd5b45292f5d23d1705")
+                    .withAdvancedBidder(FacebookAdvancedBidder.class).build(), null);
+            sNativeInitialized = true;
+        }
+
         super.onCreateView(inflater, container, savedInstanceState);
         mAdConfiguration = MoPubSampleAdUnit.fromBundle(getArguments());
         final View view = inflater.inflate(R.layout.native_detail_fragment, container, false);

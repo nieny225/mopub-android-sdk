@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.mopub.nativeads.GooglePlayServicesAdRenderer;
 import com.mopub.nativeads.MediaViewBinder;
 import com.mopub.nativeads.MoPubAdAdapter;
 import com.mopub.nativeads.MoPubStaticNativeAdRenderer;
@@ -79,16 +80,16 @@ public class NativeListViewFragment extends Fragment {
         // This adapter will be used in place of the original adapter for the ListView.
         mAdAdapter = new MoPubAdAdapter(getActivity(), adapter, new MoPubServerPositioning());
 
+        ViewBinder staticViewBinder = new ViewBinder.Builder(R.layout.native_ad_list_item)
+                .titleId(R.id.native_title)
+                .textId(R.id.native_text)
+                .mainImageId(R.id.native_main_image)
+                .iconImageId(R.id.native_icon_image)
+                .callToActionId(R.id.native_cta)
+                .privacyInformationIconImageId(R.id.native_privacy_information_icon_image)
+                .build();
         // Set up a renderer that knows how to put ad data in your custom native view.
-        final MoPubStaticNativeAdRenderer staticAdRender = new MoPubStaticNativeAdRenderer(
-                new ViewBinder.Builder(R.layout.native_ad_list_item)
-                        .titleId(R.id.native_title)
-                        .textId(R.id.native_text)
-                        .mainImageId(R.id.native_main_image)
-                        .iconImageId(R.id.native_icon_image)
-                        .callToActionId(R.id.native_cta)
-                        .privacyInformationIconImageId(R.id.native_privacy_information_icon_image)
-                        .build());
+        final MoPubStaticNativeAdRenderer staticAdRender = new MoPubStaticNativeAdRenderer(staticViewBinder);
 
         // Set up a renderer for a video native ad.
         final MoPubVideoNativeAdRenderer videoAdRenderer = new MoPubVideoNativeAdRenderer(
@@ -101,10 +102,11 @@ public class NativeListViewFragment extends Fragment {
                         .privacyInformationIconImageId(R.id.native_privacy_information_icon_image)
                         .build());
 
-
+        final GooglePlayServicesAdRenderer googlePlayServicesAdRenderer = new GooglePlayServicesAdRenderer(staticViewBinder);
         // Register the renderers with the MoPubAdAdapter and then set the adapter on the ListView.
         mAdAdapter.registerAdRenderer(videoAdRenderer);
         mAdAdapter.registerAdRenderer(staticAdRender);
+        mAdAdapter.registerAdRenderer(googlePlayServicesAdRenderer);
         listView.setAdapter(mAdAdapter);
 
         mAdAdapter.loadAds(mAdConfiguration.getAdUnitId(), mRequestParameters);
