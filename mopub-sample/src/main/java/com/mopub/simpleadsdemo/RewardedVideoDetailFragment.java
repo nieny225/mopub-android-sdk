@@ -8,6 +8,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
@@ -45,12 +46,13 @@ public class RewardedVideoDetailFragment extends Fragment implements MoPubReward
     @Nullable private Button mShowButton;
     @Nullable private String mAdUnitId;
     @Nullable Map<String, String> mAdUnitIdsMap;
-    @Nullable Set mAdUnitIds;
     @Nullable private Map<String, MoPubReward> mMoPubRewardsMap;
     @Nullable private MoPubReward mSelectedReward;
 
-    enum RV_STATUS {
-        EMPTY, LOADING, READY
+    public interface RewardedVideoStatus {
+        String EMPTY = "0";
+        String LOADING = "1";
+        String READY = "2";
     }
 
     @Override
@@ -67,7 +69,7 @@ public class RewardedVideoDetailFragment extends Fragment implements MoPubReward
 
         if (!sRewardedVideoInitialized) {
             MoPub.initializeSdk(getActivity(), new SdkConfiguration.Builder(
-                            "b195f8dd8ded45fe847ad89ed1d016da")
+                            "44debba1b0ff484485ef6ebda98b67cb")
                             .withNetworksToInit(sNetworksToInit).build(), null);
             sRewardedVideoInitialized = true;
         }
@@ -76,13 +78,13 @@ public class RewardedVideoDetailFragment extends Fragment implements MoPubReward
         mAdUnitId = adConfiguration.getAdUnitId();
 
         mAdUnitIdsMap = new HashMap<>();
-        mAdUnitIdsMap.put("44debba1b0ff484485ef6ebda98b67cb", "0");
-        mAdUnitIdsMap.put("d3b986d6f1bb4a589ec90fd8f79c86aa", "0");
+        mAdUnitIdsMap.put("44debba1b0ff484485ef6ebda98b67cb", RewardedVideoStatus.EMPTY);
+        mAdUnitIdsMap.put("d3b986d6f1bb4a589ec90fd8f79c86aa", RewardedVideoStatus.EMPTY);
 
         mMoPubRewardsMap = new HashMap<>();
 
         views.mDescriptionView.setText(adConfiguration.getDescription());
-        views.mAdUnitIdView.setText(mAdUnitId);
+        views.mAdUnitIdView.setText(mAdUnitIdsMap.keySet().toString());
         views.mLoadButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -99,14 +101,15 @@ public class RewardedVideoDetailFragment extends Fragment implements MoPubReward
         mShowButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                String mReadyAdUnitId = null;
                 for (String id : mAdUnitIdsMap.keySet()) {
-                    if (mAdUnitIdsMap.get(id) == "2") {
-                        mAdUnitId = id;
+                    if (mAdUnitIdsMap.get(id) == RewardedVideoStatus.READY) {
+                        mReadyAdUnitId = id;
                         break;
                     }
                 }
 
-                if (mAdUnitId == null) {
+                if (mReadyAdUnitId == null) {
                     return;
                 }
 
@@ -114,7 +117,7 @@ public class RewardedVideoDetailFragment extends Fragment implements MoPubReward
                         ? views.mCustomDataField.getText().toString()
                         : null;
 
-                MoPubRewardedVideos.showRewardedVideo(mAdUnitId, customData);
+                MoPubRewardedVideos.showRewardedVideo(mReadyAdUnitId, customData);
             }
         });
         if (views.mCustomDataField != null) {
@@ -126,12 +129,22 @@ public class RewardedVideoDetailFragment extends Fragment implements MoPubReward
 
     public void loadAd() {
         for (String id : mAdUnitIdsMap.keySet()) {
-            if (mAdUnitIdsMap.get(id) == "0") {
+            if (mAdUnitIdsMap.get(id) == RewardedVideoStatus.EMPTY) {
                 MoPubRewardedVideos.loadRewardedVideo(id);
-                mAdUnitIdsMap.put(id, "1");
+                mAdUnitIdsMap.put(id, RewardedVideoStatus.LOADING);
             }
         }
 
+    }
+
+    public int getAvailableAdCount() {
+        int num = 0;
+        for (String id : mAdUnitIdsMap.keySet()) {
+            if (mAdUnitIdsMap.get(id) == RewardedVideoStatus.READY) {
+                num++;
+            }
+        }
+        return num;
 
     }
 
@@ -145,14 +158,13 @@ public class RewardedVideoDetailFragment extends Fragment implements MoPubReward
     @Override
     public void onRewardedVideoLoadSuccess(@NonNull final String adUnitId) {
         if (mAdUnitIdsMap.containsKey(adUnitId)) {
-            mAdUnitIdsMap.put(adUnitId, "2");
-            if (mShowButton != null) {
+            mAdUnitIdsMap.put(adUnitId, RewardedVideoStatus.READY);
+            if (mShowButton != null && getAvailableAdCount() != 0) {
                 mShowButton.setEnabled(true);
             }
-            mShowButton.setEnabled(true);
-            logToast(getActivity(), "Rewarded video loaded.");
+            logToast(getActivity(), "Rewarded video loaded:" + getAvailableAdCount());
 
-            Set<MoPubReward> availableRewards = MoPubRewardedVideos.getAvailableRewards(mAdUnitId);
+            Set<MoPubReward> availableRewards = MoPubRewardedVideos.getAvailableRewards(adUnitId);
 
             // If there are more than one reward available, pop up alert dialog for reward selection
             if (availableRewards.size() > 1) {
@@ -183,9 +195,9 @@ public class RewardedVideoDetailFragment extends Fragment implements MoPubReward
     @Override
     public void onRewardedVideoLoadFailure(@NonNull final String adUnitId, @NonNull final MoPubErrorCode errorCode) {
         if (mAdUnitIdsMap.containsKey(adUnitId)) {
-            mAdUnitIdsMap.put(adUnitId, "0");
+            mAdUnitIdsMap.put(adUnitId, RewardedVideoStatus.EMPTY);
             loadAd();
-            if (mShowButton != null) {
+            if (mShowButton != null && getAvailableAdCount() == 0) {
                 mShowButton.setEnabled(false);
             }
             logToast(getActivity(), String.format(Locale.US, "Rewarded video failed to load: %s",
@@ -197,7 +209,7 @@ public class RewardedVideoDetailFragment extends Fragment implements MoPubReward
     public void onRewardedVideoStarted(@NonNull final String adUnitId) {
         if (mAdUnitIdsMap.containsKey(adUnitId)) {
             logToast(getActivity(), "Rewarded video started.");
-            if (mShowButton != null) {
+            if (mShowButton != null && getAvailableAdCount() == 0) {
                 mShowButton.setEnabled(false);
             }
         }
@@ -206,11 +218,11 @@ public class RewardedVideoDetailFragment extends Fragment implements MoPubReward
     @Override
     public void onRewardedVideoPlaybackError(@NonNull final String adUnitId, @NonNull final MoPubErrorCode errorCode) {
         if (mAdUnitIdsMap.containsKey(adUnitId)) {
-            mAdUnitIdsMap.put(adUnitId, "0");
+            mAdUnitIdsMap.put(adUnitId, RewardedVideoStatus.EMPTY);
             loadAd();
             logToast(getActivity(), String.format(Locale.US, "Rewarded video playback error: %s",
                     errorCode.toString()));
-            if (mShowButton != null) {
+            if (mShowButton != null && getAvailableAdCount() == 0) {
                 mShowButton.setEnabled(false);
             }
         }
@@ -226,13 +238,24 @@ public class RewardedVideoDetailFragment extends Fragment implements MoPubReward
     @Override
     public void onRewardedVideoClosed(@NonNull final String adUnitId) {
         if (mAdUnitIdsMap.containsKey(adUnitId)) {
-            mAdUnitIdsMap.put(adUnitId, "0");
-            loadAd();
+            mAdUnitIdsMap.put(adUnitId, RewardedVideoStatus.EMPTY);
+
+            final Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    loadAd();
+                }
+            }, 100);
+
             logToast(getActivity(), "Rewarded video closed.");
-            if (mShowButton != null) {
+
+            if (mShowButton != null && getAvailableAdCount() == 0) {
                 mShowButton.setEnabled(false);
             }
         }
+
+
     }
 
     @Override
