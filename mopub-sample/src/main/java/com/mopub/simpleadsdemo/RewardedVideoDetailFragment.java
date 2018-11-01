@@ -111,11 +111,7 @@ public class RewardedVideoDetailFragment extends Fragment implements MoPubReward
                     return;
                 }
 
-                final String customData = (views.mCustomDataField != null)
-                        ? views.mCustomDataField.getText().toString()
-                        : null;
-
-                MoPubRewardedVideos.showRewardedVideo(mReadyAdUnitId, customData);
+                MoPubRewardedVideos.showRewardedVideo(mReadyAdUnitId);
             }
         });
         if (views.mCustomDataField != null) {
