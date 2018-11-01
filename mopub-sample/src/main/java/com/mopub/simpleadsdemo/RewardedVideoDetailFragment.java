@@ -21,6 +21,7 @@ import android.widget.Button;
 import com.mopub.common.MoPub;
 import com.mopub.common.MoPubReward;
 import com.mopub.common.SdkConfiguration;
+import com.mopub.common.logging.MoPubLog;
 import com.mopub.mobileads.MoPubErrorCode;
 import com.mopub.mobileads.MoPubRewardedVideoListener;
 import com.mopub.mobileads.MoPubRewardedVideoManager.RequestParameters;
@@ -91,9 +92,9 @@ public class RewardedVideoDetailFragment extends Fragment implements MoPubReward
 
                 loadAd();
 
-                if (mShowButton != null) {
-                    mShowButton.setEnabled(false);
-                }
+//                if (mShowButton != null) {
+//                    mShowButton.setEnabled(false);
+//                }
             }
         });
         mShowButton = views.mShowButton;
@@ -144,6 +145,7 @@ public class RewardedVideoDetailFragment extends Fragment implements MoPubReward
                 num++;
             }
         }
+        MoPubLog.i("Nick getAvailableAdCount: "+ num);
         return num;
 
     }
@@ -164,31 +166,31 @@ public class RewardedVideoDetailFragment extends Fragment implements MoPubReward
             }
             logToast(getActivity(), "Rewarded video loaded:" + getAvailableAdCount());
 
-            Set<MoPubReward> availableRewards = MoPubRewardedVideos.getAvailableRewards(adUnitId);
-
-            // If there are more than one reward available, pop up alert dialog for reward selection
-            if (availableRewards.size() > 1) {
-                final SelectRewardDialogFragment selectRewardDialogFragment
-                        = SelectRewardDialogFragment.newInstance();
-
-                // The user must select a reward from the dialog
-                selectRewardDialogFragment.setCancelable(false);
-
-                // Reset rewards mapping and selected reward
-                mMoPubRewardsMap.clear();
-                mSelectedReward = null;
-
-                // Initialize mapping between reward string and reward instance
-                for (MoPubReward reward : availableRewards) {
-                    mMoPubRewardsMap.put(reward.getAmount() + " " + reward.getLabel(), reward);
-                }
-
-                selectRewardDialogFragment.loadRewards(mMoPubRewardsMap.keySet()
-                        .toArray(new String[mMoPubRewardsMap.size()]));
-                selectRewardDialogFragment.setTargetFragment(this, 0);
-                selectRewardDialogFragment.show(getActivity().getSupportFragmentManager(),
-                        "selectReward");
-            }
+//            Set<MoPubReward> availableRewards = MoPubRewardedVideos.getAvailableRewards(adUnitId);
+//
+//            // If there are more than one reward available, pop up alert dialog for reward selection
+//            if (availableRewards.size() > 1) {
+//                final SelectRewardDialogFragment selectRewardDialogFragment
+//                        = SelectRewardDialogFragment.newInstance();
+//
+//                // The user must select a reward from the dialog
+//                selectRewardDialogFragment.setCancelable(false);
+//
+//                // Reset rewards mapping and selected reward
+//                mMoPubRewardsMap.clear();
+//                mSelectedReward = null;
+//
+//                // Initialize mapping between reward string and reward instance
+//                for (MoPubReward reward : availableRewards) {
+//                    mMoPubRewardsMap.put(reward.getAmount() + " " + reward.getLabel(), reward);
+//                }
+//
+//                selectRewardDialogFragment.loadRewards(mMoPubRewardsMap.keySet()
+//                        .toArray(new String[mMoPubRewardsMap.size()]));
+//                selectRewardDialogFragment.setTargetFragment(this, 0);
+//                selectRewardDialogFragment.show(getActivity().getSupportFragmentManager(),
+//                        "selectReward");
+//            }
         }
     }
 
@@ -261,7 +263,7 @@ public class RewardedVideoDetailFragment extends Fragment implements MoPubReward
     @Override
     public void onRewardedVideoCompleted(@NonNull final Set<String> adUnitIds,
             @NonNull final MoPubReward reward) {
-        if (adUnitIds.contains(mAdUnitId)) {
+        if (mAdUnitIdsMap.keySet().containsAll(adUnitIds)) {
             logToast(getActivity(),
                     String.format(Locale.US,
                             "Rewarded video completed with reward  \"%d %s\"",
@@ -271,56 +273,56 @@ public class RewardedVideoDetailFragment extends Fragment implements MoPubReward
 
     }
 
-    public void selectReward(@NonNull String selectedReward) {
-        mSelectedReward = mMoPubRewardsMap.get(selectedReward);
-        MoPubRewardedVideos.selectReward(mAdUnitId, mSelectedReward);
-    }
+//    public void selectReward(@NonNull String selectedReward) {
+//        mSelectedReward = mMoPubRewardsMap.get(selectedReward);
+//        MoPubRewardedVideos.selectReward(mAdUnitId, mSelectedReward);
+//    }
 
-    public static class SelectRewardDialogFragment extends DialogFragment {
-        @NonNull private String[] mRewards;
-        @NonNull private String mSelectedReward;
-
-        public static SelectRewardDialogFragment newInstance() {
-            return new SelectRewardDialogFragment();
-        }
-
-        public void loadRewards(@NonNull String[] rewards) {
-            mRewards = rewards;
-        }
-
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            AlertDialog dialog = new AlertDialog.Builder(getActivity())
-                    .setTitle("Select a reward")
-                    .setSingleChoiceItems(mRewards, -1, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            mSelectedReward = mRewards[which];
-                        }
-                    })
-                    .setPositiveButton("Select", null)
-                    .create();
-
-            // Overriding onShow() of dialog's OnShowListener() and onClick() of the Select button's
-            // OnClickListener() to prevent the dialog from dismissing upon any button click without
-            // selecting an item first.
-            dialog.setOnShowListener(new DialogInterface.OnShowListener() {
-                @Override
-                public void onShow(DialogInterface dialog) {
-                    Button selectButton = ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE);
-                    selectButton.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            if (mSelectedReward != null) {
-                                ((RewardedVideoDetailFragment) getTargetFragment())
-                                        .selectReward(mSelectedReward);
-                                dismiss();
-                            }
-                        }
-                    });
-                }
-            });
-
-            return dialog;
-        }
-    }
+//    public static class SelectRewardDialogFragment extends DialogFragment {
+//        @NonNull private String[] mRewards;
+//        @NonNull private String mSelectedReward;
+//
+//        public static SelectRewardDialogFragment newInstance() {
+//            return new SelectRewardDialogFragment();
+//        }
+//
+//        public void loadRewards(@NonNull String[] rewards) {
+//            mRewards = rewards;
+//        }
+//
+//        @Override
+//        public Dialog onCreateDialog(Bundle savedInstanceState) {
+//            AlertDialog dialog = new AlertDialog.Builder(getActivity())
+//                    .setTitle("Select a reward")
+//                    .setSingleChoiceItems(mRewards, -1, new DialogInterface.OnClickListener() {
+//                        public void onClick(DialogInterface dialog, int which) {
+//                            mSelectedReward = mRewards[which];
+//                        }
+//                    })
+//                    .setPositiveButton("Select", null)
+//                    .create();
+//
+//            // Overriding onShow() of dialog's OnShowListener() and onClick() of the Select button's
+//            // OnClickListener() to prevent the dialog from dismissing upon any button click without
+//            // selecting an item first.
+//            dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+//                @Override
+//                public void onShow(DialogInterface dialog) {
+//                    Button selectButton = ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE);
+//                    selectButton.setOnClickListener(new View.OnClickListener() {
+//                        @Override
+//                        public void onClick(View v) {
+//                            if (mSelectedReward != null) {
+//                                ((RewardedVideoDetailFragment) getTargetFragment())
+//                                        .selectReward(mSelectedReward);
+//                                dismiss();
+//                            }
+//                        }
+//                    });
+//                }
+//            });
+//
+//            return dialog;
+//        }
+//    }
 }
