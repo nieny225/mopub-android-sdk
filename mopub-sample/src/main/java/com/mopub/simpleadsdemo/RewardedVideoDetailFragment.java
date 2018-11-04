@@ -44,21 +44,22 @@ public class RewardedVideoDetailFragment extends Fragment implements MoPubReward
     public static final int DEFAULT_RETRY_LIMIT = 20;
     public static final int DEFAULT_RETRY_DELAY_MS = 1000;
 
-    private static boolean sRewardedVideoInitialized;
-
-    // Include any custom event rewarded video classes, if available, for initialization.
-    private static final List<String> sNetworksToInit = new LinkedList<>();
-    @Nullable private Button mShowButton;
-    @Nullable Map<String, Integer> mAdUnitIdsMap;
-    private final Handler handler = new Handler();
-    private static int sRetryCount = 0;
-    private static int sDelayMs = 1000;
-
     public interface RewardedVideoStatus {
         int EMPTY = 0;
         int LOADING = 1;
         int READY = 2;
     }
+
+    private static boolean sRewardedVideoInitialized;
+
+    // Include any custom event rewarded video classes, if available, for initialization.
+    private static final List<String> sNetworksToInit = new LinkedList<>();
+    @Nullable private Button mShowButton;
+    @Nullable Map<String, Integer> mAdUnitIdsMap = new HashMap<>();
+
+    private final Handler handler = new Handler();
+    private static int sRetryCount = 0;
+    private static int sDelayMs = 1000;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -80,7 +81,6 @@ public class RewardedVideoDetailFragment extends Fragment implements MoPubReward
         }
         MoPubRewardedVideos.setRewardedVideoListener(this);
 
-        mAdUnitIdsMap = new HashMap<>();
         mAdUnitIdsMap.put(MAIN_ADUNIT, RewardedVideoStatus.EMPTY);
         mAdUnitIdsMap.put(BACKFILL_ADUNIT, RewardedVideoStatus.EMPTY);
 
@@ -90,6 +90,8 @@ public class RewardedVideoDetailFragment extends Fragment implements MoPubReward
             @Override
             public void onClick(View view) {
 
+                handler.removeCallbacksAndMessages(null);
+                resetRetry();
                 loadAd();
 
             }
@@ -99,21 +101,15 @@ public class RewardedVideoDetailFragment extends Fragment implements MoPubReward
         mShowButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String mReadyAdUnitId = null;
                 for (String id : mAdUnitIdsMap.keySet()) {
                     if (mAdUnitIdsMap.get(id) == RewardedVideoStatus.READY) {
-                        mReadyAdUnitId = id;
+                        MoPubRewardedVideos.showRewardedVideo(id);
                         break;
                     }
                 }
-
-                if (mReadyAdUnitId == null) {
-                    return;
-                }
-
-                MoPubRewardedVideos.showRewardedVideo(mReadyAdUnitId);
             }
         });
+
         if (views.mCustomDataField != null) {
             views.mCustomDataField.setVisibility(View.VISIBLE);
         }
@@ -121,7 +117,7 @@ public class RewardedVideoDetailFragment extends Fragment implements MoPubReward
         return view;
     }
 
-    public void loadAd() {
+    private void loadAd() {
         for (String id : mAdUnitIdsMap.keySet()) {
             if (mAdUnitIdsMap.get(id) == RewardedVideoStatus.EMPTY) {
                 MoPubRewardedVideos.loadRewardedVideo(id);
@@ -133,7 +129,7 @@ public class RewardedVideoDetailFragment extends Fragment implements MoPubReward
 
     }
 
-    public void retryLoadAd() {
+    private void retryLoadAd() {
         if (sRetryCount < DEFAULT_RETRY_LIMIT) {
             handler.postDelayed(new Runnable() {
                 @Override
@@ -147,22 +143,36 @@ public class RewardedVideoDetailFragment extends Fragment implements MoPubReward
         }
     }
 
-    public void resetRetry() {
+    private void resetRetry() {
         sRetryCount = 0;
         sDelayMs = DEFAULT_RETRY_DELAY_MS;
 
         logToast(getActivity(), "Reset retry");
     }
 
-    public int getAvailableAdCount() {
-        int num = 0;
+    private int getAvailableAdCount() {
+        int availableAdCount = 0;
         for (String id : mAdUnitIdsMap.keySet()) {
             if (mAdUnitIdsMap.get(id) == RewardedVideoStatus.READY) {
-                num++;
+                availableAdCount++;
             }
         }
-        return num;
+        return availableAdCount;
 
+    }
+
+    private void updateShowButtonStatus() {
+
+        int availableAdCount = getAvailableAdCount();
+
+        if (mShowButton != null){
+            if (availableAdCount > 0)
+                mShowButton.setEnabled(true);
+            else
+                mShowButton.setEnabled(false);
+
+        }
+        mShowButton.setText("Show (" + availableAdCount + ")");
     }
 
     @Override
@@ -176,9 +186,8 @@ public class RewardedVideoDetailFragment extends Fragment implements MoPubReward
     public void onRewardedVideoLoadSuccess(@NonNull final String adUnitId) {
         if (mAdUnitIdsMap.containsKey(adUnitId)) {
             mAdUnitIdsMap.put(adUnitId, RewardedVideoStatus.READY);
-            if (mShowButton != null && getAvailableAdCount() != 0) {
-                mShowButton.setEnabled(true);
-            }
+
+            updateShowButtonStatus();
 
             resetRetry();
 
@@ -194,9 +203,8 @@ public class RewardedVideoDetailFragment extends Fragment implements MoPubReward
 
             retryLoadAd();
 
-            if (mShowButton != null && getAvailableAdCount() == 0) {
-                mShowButton.setEnabled(false);
-            }
+            updateShowButtonStatus();
+
             logToast(getActivity(), String.format(Locale.US, "Rewarded video failed to load: %s " + adUnitId,
                     errorCode.toString()));
         }
@@ -206,9 +214,7 @@ public class RewardedVideoDetailFragment extends Fragment implements MoPubReward
     public void onRewardedVideoStarted(@NonNull final String adUnitId) {
         if (mAdUnitIdsMap.containsKey(adUnitId)) {
             logToast(getActivity(), "Rewarded video started. " + adUnitId);
-            if (mShowButton != null && getAvailableAdCount() == 0) {
-                mShowButton.setEnabled(false);
-            }
+            updateShowButtonStatus();
         }
     }
 
@@ -222,9 +228,8 @@ public class RewardedVideoDetailFragment extends Fragment implements MoPubReward
 
             logToast(getActivity(), String.format(Locale.US, "Rewarded video playback error: %s " + adUnitId,
                     errorCode.toString()));
-            if (mShowButton != null && getAvailableAdCount() == 0) {
-                mShowButton.setEnabled(false);
-            }
+
+            updateShowButtonStatus();
         }
     }
 
@@ -250,9 +255,7 @@ public class RewardedVideoDetailFragment extends Fragment implements MoPubReward
 
             logToast(getActivity(), "Rewarded video closed. " + adUnitId);
 
-            if (mShowButton != null && getAvailableAdCount() == 0) {
-                mShowButton.setEnabled(false);
-            }
+            updateShowButtonStatus();
         }
 
 
