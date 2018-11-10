@@ -102,7 +102,7 @@ public class RewardedVideoDetailFragment extends Fragment implements MoPubReward
             @Override
             public void onClick(View view) {
                 for (String id : mAdUnitIdsMap.keySet()) {
-                    if (mAdUnitIdsMap.get(id) == RewardedVideoStatus.READY) {
+                    if (MoPubRewardedVideos.hasRewardedVideo(id)) {
                         MoPubRewardedVideos.showRewardedVideo(id);
                         break;
                     }
@@ -153,7 +153,7 @@ public class RewardedVideoDetailFragment extends Fragment implements MoPubReward
     private int getAvailableAdCount() {
         int availableAdCount = 0;
         for (String id : mAdUnitIdsMap.keySet()) {
-            if (mAdUnitIdsMap.get(id) == RewardedVideoStatus.READY) {
+            if (MoPubRewardedVideos.hasRewardedVideo(id)) {
                 availableAdCount++;
             }
         }
