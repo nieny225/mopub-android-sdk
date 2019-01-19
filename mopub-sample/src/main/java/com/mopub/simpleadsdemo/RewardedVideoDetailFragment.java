@@ -39,8 +39,8 @@ import static com.mopub.simpleadsdemo.Utils.logToast;
 
 public class RewardedVideoDetailFragment extends Fragment implements MoPubRewardedVideoListener {
 
-    public static final String MAIN_ADUNIT = "44debba1b0ff484485ef6ebda98b67cb";
-    public static final String BACKFILL_ADUNIT = "d3b986d6f1bb4a589ec90fd8f79c86aa";
+    public static final String MAIN_ADUNIT = "facae35b91a1451c87b2d6dcb9776873";
+    public static final String BACKFILL_ADUNIT = "61cfe99517a148e29148b1aeea3dc73e";
     public static final int DEFAULT_RETRY_LIMIT = 20;
     public static final int DEFAULT_RETRY_DELAY_MS = 1000;
 
@@ -184,6 +184,7 @@ public class RewardedVideoDetailFragment extends Fragment implements MoPubReward
     // MoPubRewardedVideoListener implementation
     @Override
     public void onRewardedVideoLoadSuccess(@NonNull final String adUnitId) {
+        MoPubLog.d("onRewardedVideoLoadSuccess(): " + adUnitId);
         if (mAdUnitIdsMap.containsKey(adUnitId)) {
             mAdUnitIdsMap.put(adUnitId, RewardedVideoStatus.READY);
 
@@ -198,10 +199,11 @@ public class RewardedVideoDetailFragment extends Fragment implements MoPubReward
 
     @Override
     public void onRewardedVideoLoadFailure(@NonNull final String adUnitId, @NonNull final MoPubErrorCode errorCode) {
+        MoPubLog.d("onRewardedVideoLoadFailure(): " + adUnitId);
         if (mAdUnitIdsMap.containsKey(adUnitId)) {
             mAdUnitIdsMap.put(adUnitId, RewardedVideoStatus.EMPTY);
 
-            retryLoadAd();
+//            retryLoadAd();
 
             updateShowButtonStatus();
 
@@ -212,6 +214,7 @@ public class RewardedVideoDetailFragment extends Fragment implements MoPubReward
 
     @Override
     public void onRewardedVideoStarted(@NonNull final String adUnitId) {
+        MoPubLog.d("onRewardedVideoStarted(): " + adUnitId);
         if (mAdUnitIdsMap.containsKey(adUnitId)) {
             logToast(getActivity(), "Rewarded video started. " + adUnitId);
             updateShowButtonStatus();
@@ -221,6 +224,7 @@ public class RewardedVideoDetailFragment extends Fragment implements MoPubReward
 
     @Override
     public void onRewardedVideoPlaybackError(@NonNull final String adUnitId, @NonNull final MoPubErrorCode errorCode) {
+        MoPubLog.d("onRewardedVideoPlaybackError(): " + adUnitId);
         if (mAdUnitIdsMap.containsKey(adUnitId)) {
             mAdUnitIdsMap.put(adUnitId, RewardedVideoStatus.EMPTY);
 
@@ -242,6 +246,7 @@ public class RewardedVideoDetailFragment extends Fragment implements MoPubReward
 
     @Override
     public void onRewardedVideoClosed(@NonNull final String adUnitId) {
+        MoPubLog.d("onRewardedVideoClosed(): " + adUnitId);
         if (mAdUnitIdsMap.containsKey(adUnitId)) {
             mAdUnitIdsMap.put(adUnitId, RewardedVideoStatus.EMPTY);
 
@@ -264,6 +269,7 @@ public class RewardedVideoDetailFragment extends Fragment implements MoPubReward
     @Override
     public void onRewardedVideoCompleted(@NonNull final Set<String> adUnitIds,
             @NonNull final MoPubReward reward) {
+        MoPubLog.d("onRewardedVideoCompleted(): " + adUnitIds);
         if (mAdUnitIdsMap.keySet().containsAll(adUnitIds)) {
             logToast(getActivity(),
                     String.format(Locale.US,
