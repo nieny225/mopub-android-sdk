@@ -235,6 +235,7 @@ public class IronSourceRewardedVideo extends CustomEventRewardedVideo implements
     //Invoked when the RewardedVideo ad view has opened.
     @Override
     public void onRewardedVideoAdOpened(String instanceId) {
+        MoPubLog.d("Nick:Ironsource:onRewardedVideoAdOpened " + instanceId);
         MoPubLog.d("IronSource Rewarded Video opened ad for instance " + instanceId);
         onRewardedVideoStarted(IronSourceRewardedVideo.class, instanceId);
     }
@@ -242,6 +243,7 @@ public class IronSourceRewardedVideo extends CustomEventRewardedVideo implements
     //Invoked when the user is about to return to the application after closing the RewardedVideo ad.
     @Override
     public void onRewardedVideoAdClosed(String instanceId) {
+        MoPubLog.d("Nick:Ironsource:onRewardedVideoAdClosed " + instanceId);
         MoPubLog.d("IronSource Rewarded Video closed ad for instance " + instanceId);
         onRewardedVideoClosed(IronSourceRewardedVideo.class, instanceId);
     }
@@ -249,6 +251,7 @@ public class IronSourceRewardedVideo extends CustomEventRewardedVideo implements
     //Invoked when the user completed the video and should be rewarded.
     @Override
     public void onRewardedVideoAdRewarded(String instanceId, Placement placement) {
+        MoPubLog.d("Nick:Ironsource:onRewardedVideoAdRewarded " + instanceId);
         MoPubLog.d("IronSource Rewarded Video received reward for instance " + instanceId);
 
         //Placement can return null if the placementName is not valid.

@@ -162,6 +162,7 @@ public class AppLovinRewardedVideo extends CustomEventRewardedVideo implements A
 
     @Override
     public void adReceived(final AppLovinAd ad) {
+        MoPubLog.d("Nick:AppLovin:adReceived");
         MoPubLog.d("Rewarded video did load ad: " + ad.getAdIdNumber());
 
         if (isTokenEvent) {
@@ -202,12 +203,14 @@ public class AppLovinRewardedVideo extends CustomEventRewardedVideo implements A
 
     @Override
     public void adDisplayed(final AppLovinAd ad) {
+        MoPubLog.d("Nick:AppLovin:adDisplayed");
         MoPubLog.d("Rewarded video displayed");
         MoPubRewardedVideoManager.onRewardedVideoStarted(getClass(), getAdNetworkId());
     }
 
     @Override
     public void adHidden(final AppLovinAd ad) {
+        MoPubLog.d("Nick:AppLovin:adHidden");
         MoPubLog.d("Rewarded video dismissed");
 
         if (fullyWatched && reward != null) {
@@ -234,11 +237,13 @@ public class AppLovinRewardedVideo extends CustomEventRewardedVideo implements A
 
     @Override
     public void videoPlaybackBegan(final AppLovinAd ad) {
+        MoPubLog.d("Nick:AppLovin:videoPlaybackBegan");
         MoPubLog.d("Rewarded video playback began");
     }
 
     @Override
     public void videoPlaybackEnded(final AppLovinAd ad, final double percentViewed, final boolean fullyWatched) {
+        MoPubLog.d("Nick:AppLovin:videoPlaybackEnded");
         MoPubLog.d("Rewarded video playback ended at playback percent: " + percentViewed);
 
         this.fullyWatched = fullyWatched;

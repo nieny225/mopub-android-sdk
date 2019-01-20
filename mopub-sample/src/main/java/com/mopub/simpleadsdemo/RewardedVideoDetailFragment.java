@@ -41,6 +41,7 @@ public class RewardedVideoDetailFragment extends Fragment implements MoPubReward
 
     public static final String MAIN_ADUNIT = "facae35b91a1451c87b2d6dcb9776873";
     public static final String BACKFILL_ADUNIT = "61cfe99517a148e29148b1aeea3dc73e";
+    public static final boolean TEST_RV_MULTIPLE = true;
     public static final int DEFAULT_RETRY_LIMIT = 20;
     public static final int DEFAULT_RETRY_DELAY_MS = 1000;
 
@@ -82,7 +83,9 @@ public class RewardedVideoDetailFragment extends Fragment implements MoPubReward
         MoPubRewardedVideos.setRewardedVideoListener(this);
 
         mAdUnitIdsMap.put(MAIN_ADUNIT, RewardedVideoStatus.EMPTY);
-        mAdUnitIdsMap.put(BACKFILL_ADUNIT, RewardedVideoStatus.EMPTY);
+        if(TEST_RV_MULTIPLE) {
+            mAdUnitIdsMap.put(BACKFILL_ADUNIT, RewardedVideoStatus.EMPTY);
+        }
 
         views.mDescriptionView.setText(adConfiguration.getDescription());
         views.mAdUnitIdView.setText(mAdUnitIdsMap.keySet().toString());
@@ -177,7 +180,8 @@ public class RewardedVideoDetailFragment extends Fragment implements MoPubReward
 
     @Override
     public void onDestroyView() {
-        MoPubRewardedVideos.setRewardedVideoListener(null);
+//        MoPubRewardedVideos.setRewardedVideoListener(null);
+        MoPubLog.d("onDestroyView()");
         super.onDestroyView();
     }
 
@@ -190,7 +194,7 @@ public class RewardedVideoDetailFragment extends Fragment implements MoPubReward
 
             updateShowButtonStatus();
 
-            resetRetry();
+//            resetRetry();
 
             logToast(getActivity(), "Rewarded video loaded: " + adUnitId);
 

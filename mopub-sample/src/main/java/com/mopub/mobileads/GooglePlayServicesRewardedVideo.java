@@ -19,6 +19,7 @@ import com.mopub.common.BaseLifecycleListener;
 import com.mopub.common.LifecycleListener;
 import com.mopub.common.MediationSettings;
 import com.mopub.common.MoPubReward;
+import com.mopub.common.logging.MoPubLog;
 
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -236,6 +237,7 @@ public class GooglePlayServicesRewardedVideo extends CustomEventRewardedVideo im
 
     @Override
     public void onRewardedVideoAdLoaded() {
+        MoPubLog.d("Nick:AdMob:onRewardedVideoAdLoaded " + mAdUnitId);
         MoPubRewardedVideoManager.onRewardedVideoLoadSuccess(
                 GooglePlayServicesRewardedVideo.class,
                 mAdUnitId);
@@ -249,6 +251,7 @@ public class GooglePlayServicesRewardedVideo extends CustomEventRewardedVideo im
 
     @Override
     public void onRewardedVideoStarted() {
+        MoPubLog.d("Nick:AdMob:onRewardedVideoStarted " + mAdUnitId);
         MoPubRewardedVideoManager.onRewardedVideoStarted(
                 GooglePlayServicesRewardedVideo.class,
                 mAdUnitId);
@@ -256,6 +259,7 @@ public class GooglePlayServicesRewardedVideo extends CustomEventRewardedVideo im
 
     @Override
     public void onRewardedVideoAdClosed() {
+        MoPubLog.d("Nick:AdMob:onRewardedVideoAdClosed " + mAdUnitId);
         MoPubRewardedVideoManager.onRewardedVideoClosed(
                 GooglePlayServicesRewardedVideo.class,
                 mAdUnitId);
@@ -263,6 +267,7 @@ public class GooglePlayServicesRewardedVideo extends CustomEventRewardedVideo im
 
     @Override
     public void onRewardedVideoCompleted() {
+        MoPubLog.d("Nick:AdMob:onRewardedVideoCompleted");
         // Already notifying MoPub of playback completion in onRewarded(). Do nothing.
     }
 

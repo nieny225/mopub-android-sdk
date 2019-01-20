@@ -141,6 +141,7 @@ public class FacebookRewardedVideo extends CustomEventRewardedVideo implements R
 
     @Override
     public void onRewardedVideoCompleted() {
+        MoPubLog.d("Nick:FAN:onRewardedVideoCompleted " + mPlacementId);
         MoPubLog.d("Facebook Rewarded Video creative is completed. Awarding the user.");
         MoPubRewardedVideoManager.onRewardedVideoCompleted(FacebookRewardedVideo.class, mPlacementId, MoPubReward.success(MoPubReward.NO_REWARD_LABEL, MoPubReward.DEFAULT_REWARD_AMOUNT));
     }
@@ -154,12 +155,14 @@ public class FacebookRewardedVideo extends CustomEventRewardedVideo implements R
 
     @Override
     public void onRewardedVideoClosed() {
+        MoPubLog.d("Nick:FAN:onRewardedVideoClosed " + mPlacementId);
         MoPubRewardedVideoManager.onRewardedVideoClosed(FacebookRewardedVideo.class, mPlacementId);
         MoPubLog.d("Facebook Rewarded Video creative closed.");
     }
 
     @Override
     public void onAdLoaded(Ad ad) {
+        MoPubLog.d("Nick:FAN:onAdLoaded " + mPlacementId);
         cancelExpirationTimer();
         mHandler.postDelayed(mAdExpiration, ONE_HOURS_MILLIS);
 

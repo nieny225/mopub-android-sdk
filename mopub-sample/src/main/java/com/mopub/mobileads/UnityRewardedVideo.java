@@ -1,6 +1,7 @@
 package com.mopub.mobileads;
 
 import android.app.Activity;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -112,6 +113,7 @@ public class UnityRewardedVideo extends CustomEventRewardedVideo {
             CustomEventRewardedVideoListener {
         @Override
         public void onUnityAdsReady(String placementId) {
+            MoPubLog.d("Nick:UnityAd:onUnityAdsReady " + placementId);
             if (placementId.equals(sPlacementId)) {
                 MoPubLog.d("Unity rewarded video cached for placement " + placementId + ".");
                 MoPubRewardedVideoManager.onRewardedVideoLoadSuccess(UnityRewardedVideo.class, placementId);
@@ -120,12 +122,14 @@ public class UnityRewardedVideo extends CustomEventRewardedVideo {
 
         @Override
         public void onUnityAdsStart(String placementId) {
+            MoPubLog.d("Nick:UnityAd:onUnityAdsStart " + placementId);
             MoPubRewardedVideoManager.onRewardedVideoStarted(UnityRewardedVideo.class, placementId);
             MoPubLog.d("Unity rewarded video started for placement " + placementId + ".");
         }
 
         @Override
         public void onUnityAdsFinish(String placementId, UnityAds.FinishState finishState) {
+            MoPubLog.d("Nick:UnityAd:onUnityAdsFinish " + placementId);
             MoPubLog.d("Unity Ad finished with finish state = " + finishState);
             if (finishState == UnityAds.FinishState.ERROR) {
                 MoPubRewardedVideoManager.onRewardedVideoPlaybackError(
