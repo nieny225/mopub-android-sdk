@@ -22,6 +22,7 @@ import com.mopub.common.MoPub;
 import com.mopub.common.MoPubReward;
 import com.mopub.common.SdkConfiguration;
 import com.mopub.common.logging.MoPubLog;
+import com.mopub.mobileads.GooglePlayServicesRewardedVideo;
 import com.mopub.mobileads.MoPubErrorCode;
 import com.mopub.mobileads.MoPubRewardedVideoListener;
 import com.mopub.mobileads.MoPubRewardedVideoManager.RequestParameters;
@@ -77,7 +78,9 @@ public class RewardedVideoDetailFragment extends Fragment implements MoPubReward
         if (!sRewardedVideoInitialized) {
             MoPub.initializeSdk(getActivity(), new SdkConfiguration.Builder(
                     MAIN_ADUNIT)
-                            .withNetworksToInit(sNetworksToInit).build(), null);
+                            .withNetworksToInit(sNetworksToInit)
+                    .withMediationSettings(new GooglePlayServicesRewardedVideo.GooglePlayServicesMediationSettings(null, null, "247AB46D51AA063D30C3C93D759B003D"))
+                    .build(), null);
             sRewardedVideoInitialized = true;
         }
         MoPubRewardedVideos.setRewardedVideoListener(this);
