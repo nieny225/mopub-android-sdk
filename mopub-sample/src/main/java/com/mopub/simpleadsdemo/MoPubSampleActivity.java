@@ -88,9 +88,10 @@ public class MoPubSampleActivity extends FragmentActivity {
             createMoPubListFragment(getIntent());
         }
 
-        SdkConfiguration sdkConfiguration = new SdkConfiguration.Builder("facfc5e6d36d45329fbaf228e2cd4a36")
-                .withAdvancedBidder(FacebookAdvancedBidder.class).build();
-        MoPub.initializeSdk(this, sdkConfiguration, initSdkListener());
+//        SdkConfiguration sdkConfiguration = new SdkConfiguration.Builder("facfc5e6d36d45329fbaf228e2cd4a36")
+//                .withAdvancedBidder(FacebookAdvancedBidder.class)
+//                .build();
+//        MoPub.initializeSdk(this, sdkConfiguration, initSdkListener());
 
 
         mConsentStatusChangeListener = initConsentChangeListener();

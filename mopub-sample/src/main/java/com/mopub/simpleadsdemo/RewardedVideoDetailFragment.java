@@ -40,8 +40,9 @@ import static com.mopub.simpleadsdemo.Utils.logToast;
 
 public class RewardedVideoDetailFragment extends Fragment implements MoPubRewardedVideoListener {
 
-    public static final String MAIN_ADUNIT = "facae35b91a1451c87b2d6dcb9776873";
-    public static final String BACKFILL_ADUNIT = "61cfe99517a148e29148b1aeea3dc73e";
+    //AdMob
+    public static final String MAIN_ADUNIT = "faef74616c604395bbf155138b9d0185";
+    public static final String BACKFILL_ADUNIT = "4f8c25771e0c48b59729812cb89fb888";
     public static final boolean TEST_RV_MULTIPLE = true;
     public static final int DEFAULT_RETRY_LIMIT = 20;
     public static final int DEFAULT_RETRY_DELAY_MS = 1000;
@@ -76,10 +77,11 @@ public class RewardedVideoDetailFragment extends Fragment implements MoPubReward
         hideSoftKeyboard(views.mUserDataKeywordsField);
 
         if (!sRewardedVideoInitialized) {
+            MoPubLog.d("call MoPub.initializeSdk()");
             MoPub.initializeSdk(getActivity(), new SdkConfiguration.Builder(
                     MAIN_ADUNIT)
                             .withNetworksToInit(sNetworksToInit)
-                    .withMediationSettings(new GooglePlayServicesRewardedVideo.GooglePlayServicesMediationSettings(null, null, "247AB46D51AA063D30C3C93D759B003D"))
+                    .withMediationSettings(new GooglePlayServicesRewardedVideo.GooglePlayServicesMediationSettings(null, null, "42D1589D81E5DB3E38BE0A40250B7C58"))
                     .build(), null);
             sRewardedVideoInitialized = true;
         }
@@ -191,7 +193,7 @@ public class RewardedVideoDetailFragment extends Fragment implements MoPubReward
     // MoPubRewardedVideoListener implementation
     @Override
     public void onRewardedVideoLoadSuccess(@NonNull final String adUnitId) {
-        MoPubLog.d("onRewardedVideoLoadSuccess(): " + adUnitId);
+        MoPubLog.d("MoPubRewardedVideoListener onRewardedVideoLoadSuccess(): " + adUnitId);
         if (mAdUnitIdsMap.containsKey(adUnitId)) {
             mAdUnitIdsMap.put(adUnitId, RewardedVideoStatus.READY);
 
@@ -199,7 +201,7 @@ public class RewardedVideoDetailFragment extends Fragment implements MoPubReward
 
 //            resetRetry();
 
-            logToast(getActivity(), "Rewarded video loaded: " + adUnitId);
+//            logToast(getActivity(), "Rewarded video loaded: " + adUnitId);
 
         }
     }

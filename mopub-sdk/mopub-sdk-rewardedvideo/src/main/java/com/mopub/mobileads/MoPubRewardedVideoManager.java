@@ -323,6 +323,7 @@ public class MoPubRewardedVideoManager {
                 public void run() {
                     if (sInstance.mVideoListener != null) {
                         sInstance.mVideoListener.onRewardedVideoLoadSuccess(adUnitId);
+                        MoPubLog.d("sInstance.mVideoListener.onRewardedVideoLoadSuccess(): "+adUnitId);
                     }
                 }
             });
@@ -692,6 +693,7 @@ public class MoPubRewardedVideoManager {
      */
     public static <T extends CustomEventRewardedAd>
     void onRewardedVideoLoadSuccess(@NonNull final Class<T> customEventClass, @NonNull final String thirdPartyId) {
+        MoPubLog.d("MoPubRewardedVideoManager.onRewardedVideoLoadSuccess()");
         postToInstance(new ForEachMoPubIdRunnable(customEventClass, thirdPartyId) {
             @Override
             protected void forEach(@NonNull final String moPubId) {

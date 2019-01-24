@@ -154,6 +154,7 @@ public class GooglePlayServicesRewardedVideo extends CustomEventRewardedVideo im
                                           @NonNull final Map<String, String> serverExtras)
             throws Exception {
 
+        MoPubLog.d("loadWithSdkInitialized()");
         /* AdMob's isLoaded() has to be called on the main thread to avoid multithreading crashes
         when mediating on Unity */
         new Handler(Looper.getMainLooper()).post(new Runnable() {
@@ -178,8 +179,11 @@ public class GooglePlayServicesRewardedVideo extends CustomEventRewardedVideo im
                 }
 
                 if (mRewardedVideoAd.isLoaded()) {
+                    MoPubLog.d("Admob: mRewardedVideoAd.isLoaded() = true");
+
                     MoPubRewardedVideoManager
                             .onRewardedVideoLoadSuccess(GooglePlayServicesRewardedVideo.class, mAdUnitId);
+
                 } else {
                     AdRequest.Builder builder = new AdRequest.Builder();
                     builder.setRequestAgent("MoPub");
@@ -203,6 +207,7 @@ public class GooglePlayServicesRewardedVideo extends CustomEventRewardedVideo im
                     forwardNpaIfSet(builder);
 
                     AdRequest adRequest = builder.build();
+                    MoPubLog.d("Admob: mRewardedVideoAd.loadAd()");
                     mRewardedVideoAd.loadAd(mAdUnitId, adRequest);
                 }
             }
@@ -220,11 +225,13 @@ public class GooglePlayServicesRewardedVideo extends CustomEventRewardedVideo im
 
     @Override
     protected boolean hasVideoAvailable() {
+        MoPubLog.d("Admob: hasVideoAvailable:"+ (mRewardedVideoAd != null && isAdLoaded));
         return mRewardedVideoAd != null && isAdLoaded;
     }
 
     @Override
     protected void showVideo() {
+        MoPubLog.d("Admob: showVideo()");
         if (hasVideoAvailable()) {
             mRewardedVideoAd.show();
         } else {
@@ -288,10 +295,12 @@ public class GooglePlayServicesRewardedVideo extends CustomEventRewardedVideo im
 
     @Override
     public void onRewardedVideoAdFailedToLoad(int error) {
+        MoPubLog.d("Nick:AdMob:onRewardedVideoAdFailedToLoad");
         MoPubRewardedVideoManager.onRewardedVideoLoadFailure(
                 GooglePlayServicesRewardedVideo.class,
                 mAdUnitId,
                 getMoPubErrorCode(error));
+
     }
 
     /**
