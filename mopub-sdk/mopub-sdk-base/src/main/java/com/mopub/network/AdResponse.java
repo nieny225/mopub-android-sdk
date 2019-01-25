@@ -30,6 +30,9 @@ public class AdResponse implements Serializable {
     private final String mAdUnitId;
 
     @Nullable
+    private final String mAdGroupId;
+
+    @Nullable
     private final String mFullAdType;
     @Nullable
     private final String mNetworkType;
@@ -92,6 +95,7 @@ public class AdResponse implements Serializable {
 
         mAdType = builder.adType;
         mAdUnitId = builder.adUnitId;
+        mAdGroupId = builder.adGroupId;
         mFullAdType = builder.fullAdType;
         mNetworkType = builder.networkType;
 
@@ -145,6 +149,11 @@ public class AdResponse implements Serializable {
     @Nullable
     public String getFullAdType() {
         return mFullAdType;
+    }
+
+    @Nullable
+    public String getAdGroupId() {
+        return mAdGroupId;
     }
 
     @Nullable
@@ -304,6 +313,7 @@ public class AdResponse implements Serializable {
     public static class Builder {
         private String adType;
         private String adUnitId;
+        private String adGroupId;
         private String fullAdType;
         private String networkType;
 
@@ -344,6 +354,11 @@ public class AdResponse implements Serializable {
 
         public Builder setAdUnitId(@Nullable final String adUnitId) {
             this.adUnitId = adUnitId;
+            return this;
+        }
+
+        public Builder setAdGroupId(@Nullable final String adGroupId) {
+            this.adGroupId = adGroupId;
             return this;
         }
 

@@ -476,7 +476,9 @@ public class MoPubRewardedVideoManager {
     ///// Ad Request / Response methods /////
     void onAdSuccess(AdResponse adResponse) {
         final String adUnitId = adResponse.getAdUnitId();
-
+        MoPubLog.d("adResponse.getAdUnitId() : " + adResponse.getAdUnitId());
+        MoPubLog.d("adResponse.getAdGroupId(): " + adResponse.getAdGroupId());
+        MoPubLog.d("adResponse.getCustomEventClassName(): " + adResponse.getCustomEventClassName());
         Integer timeoutMillis = adResponse.getAdTimeoutMillis(DEFAULT_LOAD_TIMEOUT);
         final String customEventClassName = adResponse.getCustomEventClassName();
 
