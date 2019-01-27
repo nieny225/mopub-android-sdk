@@ -41,8 +41,12 @@ import static com.mopub.simpleadsdemo.Utils.logToast;
 public class RewardedVideoDetailFragment extends Fragment implements MoPubRewardedVideoListener {
 
     //AdMob - problem
-    public static final String MAIN_ADUNIT = "b066f1f396854604b42fadb33f9d4cca";
-    public static final String BACKFILL_ADUNIT = "fa22094978944adfa143aa2b2f129ccd";
+    public static final String MAIN_ADUNIT = "b066f1f396854604b42fadb33f9d4cca"; //ca-app-pub-2687325649049316/5470206929
+    public static final String BACKFILL_ADUNIT = "fa22094978944adfa143aa2b2f129ccd"; // ca-app-pub-2687325649049316/5657198740
+//    public static final String BACKFILL_ADUNIT = "db91dfca1d5e4ae2a54e3fadf23bedeb"; //ca-app-pub-2687325649049316/5470206929
+//    public static final String BACKFILL_ADUNIT = "b066f1f396854604b42fadb33f9d4cca"; // Queue the same ad unit
+
+
     public static final String TEST_DEVICE = "7115E6D528724F23A775699CCC2C563B";
 //    //IronSource
 //    public static final String MAIN_ADUNIT = "b720e869a892451d8815f0813c6cd342";
@@ -73,7 +77,7 @@ public class RewardedVideoDetailFragment extends Fragment implements MoPubReward
     @Nullable private Button mShowButton;
     @Nullable Map<String, RewardedVideoStatus> mAdUnitIdsMap = new HashMap<>();
 
-    private final Handler handler = new Handler();
+    private Handler handler;
     private static int sRetryCount = 0;
     private static int sDelayMs = 1000;
 
@@ -111,7 +115,7 @@ public class RewardedVideoDetailFragment extends Fragment implements MoPubReward
             @Override
             public void onClick(View view) {
 
-                handler.removeCallbacksAndMessages(null);
+//                handler.removeCallbacksAndMessages(null);
                 resetRetry();
                 loadAd();
 
@@ -124,6 +128,7 @@ public class RewardedVideoDetailFragment extends Fragment implements MoPubReward
             public void onClick(View view) {
                 for (String id : mAdUnitIdsMap.keySet()) {
                     if (MoPubRewardedVideos.hasRewardedVideo(id)) {
+                        MoPubLog.d("MoPubRewardedVideos.hasRewardedVideo(): true");
                         MoPubRewardedVideos.showRewardedVideo(id);
                         break;
                     }
@@ -151,6 +156,7 @@ public class RewardedVideoDetailFragment extends Fragment implements MoPubReward
 
     private void retryLoadAd() {
         if (sRetryCount < DEFAULT_RETRY_LIMIT) {
+            handler = new Handler();
             handler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
@@ -252,7 +258,7 @@ public class RewardedVideoDetailFragment extends Fragment implements MoPubReward
         if (mAdUnitIdsMap.containsKey(adUnitId)) {
             mAdUnitIdsMap.put(adUnitId, RewardedVideoStatus.EMPTY);
 
-            retryLoadAd();
+//            retryLoadAd();
 
 //            logToast(getActivity(), String.format(Locale.US, "Rewarded video playback error: %s " + adUnitId, errorCode.toString()));
 
@@ -264,7 +270,7 @@ public class RewardedVideoDetailFragment extends Fragment implements MoPubReward
     public void onRewardedVideoClicked(@NonNull final String adUnitId) {
         MoPubLog.d("onRewardedVideoClicked(): " + adUnitId);
         if (mAdUnitIdsMap.containsKey(adUnitId)) {
-            logToast(getActivity(), "Rewarded video clicked. " + adUnitId);
+//            logToast(getActivity(), "Rewarded video clicked. " + adUnitId);
         }
     }
 
@@ -289,11 +295,11 @@ public class RewardedVideoDetailFragment extends Fragment implements MoPubReward
             @NonNull final MoPubReward reward) {
         MoPubLog.d("onRewardedVideoCompleted(): " + adUnitIds);
         if (mAdUnitIdsMap.keySet().containsAll(adUnitIds)) {
-            logToast(getActivity(),
-                    String.format(Locale.US,
-                            "Rewarded video completed with reward  \"%d %s\" " + adUnitIds,
-                            reward.getAmount(),
-                            reward.getLabel()));
+//            logToast(getActivity(),
+//                    String.format(Locale.US,
+//                            "Rewarded video completed with reward  \"%d %s\" " + adUnitIds,
+//                            reward.getAmount(),
+//                            reward.getLabel()));
         }
 
     }

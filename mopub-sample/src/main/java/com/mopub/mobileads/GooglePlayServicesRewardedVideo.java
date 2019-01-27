@@ -232,6 +232,7 @@ public class GooglePlayServicesRewardedVideo extends CustomEventRewardedVideo im
     @Override
     protected boolean hasVideoAvailable() {
         MoPubLog.d("AdMob: "+ this.mAdUnitId +" hasVideoAvailable():"+ (mRewardedVideoAd != null && isAdLoaded));
+        MoPubLog.d("AdMob: "+" AdMob SDK MobileAds isLoaded(): "+ (mRewardedVideoAd.isLoaded()));
         return mRewardedVideoAd != null && isAdLoaded;
     }
 
