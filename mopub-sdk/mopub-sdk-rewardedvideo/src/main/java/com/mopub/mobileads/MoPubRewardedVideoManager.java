@@ -710,6 +710,7 @@ public class MoPubRewardedVideoManager {
 
     public static <T extends CustomEventRewardedAd>
     void onRewardedVideoLoadFailure(@NonNull final Class<T> customEventClass, final String thirdPartyId, final MoPubErrorCode errorCode) {
+        MoPubLog.d("MoPubRewardedVideoManager.onRewardedVideoLoadFailure()");
         postToInstance(new ForEachMoPubIdRunnable(customEventClass, thirdPartyId) {
             @Override
             protected void forEach(@NonNull final String moPubId) {
@@ -721,6 +722,7 @@ public class MoPubRewardedVideoManager {
 
     public static <T extends CustomEventRewardedAd>
     void onRewardedVideoStarted(@NonNull final Class<T> customEventClass, final String thirdPartyId) {
+        MoPubLog.d("MoPubRewardedVideoManager.onRewardedVideoStarted()");
         final String currentlyShowingAdUnitId =
                 sInstance.mRewardedAdData.getCurrentlyShowingAdUnitId();
         if (TextUtils.isEmpty(currentlyShowingAdUnitId)) {
@@ -741,6 +743,7 @@ public class MoPubRewardedVideoManager {
     }
 
     private static void onRewardedVideoStartedAction(@NonNull final String adUnitId) {
+        MoPubLog.d("MoPubRewardedVideoManager.onRewardedVideoStartedAction()");
         Preconditions.checkNotNull(adUnitId);
         if (sInstance.mVideoListener != null) {
             sInstance.mVideoListener.onRewardedVideoStarted(adUnitId);
@@ -812,6 +815,7 @@ public class MoPubRewardedVideoManager {
 
     public static <T extends CustomEventRewardedAd>
     void onRewardedVideoClosed(@NonNull final Class<T> customEventClass, final String thirdPartyId) {
+        MoPubLog.d("MoPubRewardedVideoManager.onRewardedVideoClosed()");
         final String currentlyShowingAdUnitId =
                 sInstance.mRewardedAdData.getCurrentlyShowingAdUnitId();
         if (TextUtils.isEmpty(currentlyShowingAdUnitId)) {
@@ -833,6 +837,7 @@ public class MoPubRewardedVideoManager {
     }
 
     private static void onRewardedVideoClosedAction(@NonNull final String adUnitId) {
+        MoPubLog.d("MoPubRewardedVideoManager.onRewardedVideoClosedAction()");
         Preconditions.checkNotNull(adUnitId);
         // remove adloader from map
         sInstance.rewardedAdsLoaders.markPlayed(adUnitId);
@@ -844,6 +849,7 @@ public class MoPubRewardedVideoManager {
     public static <T extends CustomEventRewardedAd>
     void onRewardedVideoCompleted(@NonNull final Class<T> customEventClass,
             final String thirdPartyId, @NonNull final MoPubReward moPubReward) {
+        MoPubLog.d("MoPubRewardedVideoManager.onRewardedVideoCompleted()");
         // Unlike other callbacks in this class, only call the listener once with all the MoPubIds
         // in the matching set.
         final String currentlyShowingAdUnitId =
