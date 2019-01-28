@@ -41,8 +41,8 @@ import static com.mopub.simpleadsdemo.Utils.logToast;
 public class RewardedVideoDetailFragment extends Fragment implements MoPubRewardedVideoListener {
 
     //AdMob - problem
-    public static final String MAIN_ADUNIT = "b066f1f396854604b42fadb33f9d4cca"; //ca-app-pub-2687325649049316/5470206929
-    public static final String BACKFILL_ADUNIT = "fa22094978944adfa143aa2b2f129ccd"; // ca-app-pub-2687325649049316/5657198740
+//    public static final String MAIN_ADUNIT = "b066f1f396854604b42fadb33f9d4cca"; //ca-app-pub-2687325649049316/5470206929
+//    public static final String BACKFILL_ADUNIT = "fa22094978944adfa143aa2b2f129ccd"; // ca-app-pub-2687325649049316/5657198740
 //    public static final String BACKFILL_ADUNIT = "db91dfca1d5e4ae2a54e3fadf23bedeb"; //ca-app-pub-2687325649049316/5470206929
 //    public static final String BACKFILL_ADUNIT = "b066f1f396854604b42fadb33f9d4cca"; // Queue the same ad unit
 
@@ -52,8 +52,8 @@ public class RewardedVideoDetailFragment extends Fragment implements MoPubReward
 //    public static final String MAIN_ADUNIT = "b720e869a892451d8815f0813c6cd342";
 //    public static final String BACKFILL_ADUNIT = "885b4f0c25884d468da2c8d657b0d95b";
 //    //Unity
-//    public static final String MAIN_ADUNIT = "fa84b7823f4147d883f6bb967f8ef15f";
-//    public static final String BACKFILL_ADUNIT = "0c379a47aec54c56aefe913870c6e631";
+    public static final String MAIN_ADUNIT = "8d2de5a1aa4a4b278a6c24ff4930a6e3";
+    public static final String BACKFILL_ADUNIT = "20ac22127e13402d90662b77d2935467";
 //    //FAN
 //    public static final String MAIN_ADUNIT = "a8d5f5fff87c49b2a60c5df86ab4f447";
 //    public static final String BACKFILL_ADUNIT = "82c3d266e084414c976e68def74136d5";

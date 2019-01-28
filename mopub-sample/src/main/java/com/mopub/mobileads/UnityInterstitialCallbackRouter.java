@@ -1,5 +1,6 @@
 package com.mopub.mobileads;
 
+import com.mopub.common.logging.MoPubLog;
 import com.unity3d.ads.UnityAds;
 import com.unity3d.ads.mediation.IUnityAdsExtendedListener;
 
@@ -12,6 +13,7 @@ public class UnityInterstitialCallbackRouter implements IUnityAdsExtendedListene
 
 	@Override
 	public void onUnityAdsReady(String placementId) {
+		MoPubLog.d("Unity Router: onUnityAdsReady: "+placementId);
 		IUnityAdsExtendedListener listener = listeners.get(placementId);
 		if (listener != null) {
 			listener.onUnityAdsReady(placementId);
@@ -20,6 +22,7 @@ public class UnityInterstitialCallbackRouter implements IUnityAdsExtendedListene
 
 	@Override
 	public void onUnityAdsStart(String placementId) {
+		MoPubLog.d("Unity Router: onUnityAdsStart: "+placementId);
 		IUnityAdsExtendedListener listener = listeners.get(placementId);
 		if (listener != null) {
 			listener.onUnityAdsStart(placementId);
@@ -29,6 +32,7 @@ public class UnityInterstitialCallbackRouter implements IUnityAdsExtendedListene
 	@Override
 	public void onUnityAdsFinish(String placementId, UnityAds.FinishState finishState) {
 		IUnityAdsExtendedListener listener = listeners.get(placementId);
+		MoPubLog.d("Unity Router: onUnityAdsFinish: "+placementId);
 		if (listener != null) {
 			listener.onUnityAdsFinish(placementId, finishState);
 		}
@@ -44,6 +48,7 @@ public class UnityInterstitialCallbackRouter implements IUnityAdsExtendedListene
 
 	@Override
 	public void onUnityAdsPlacementStateChanged(String placementId, UnityAds.PlacementState oldState, UnityAds.PlacementState newState) {
+		MoPubLog.d("Unity Router: onUnityAdsPlacementStateChanged: "+placementId);
 		IUnityAdsExtendedListener listener = listeners.get(placementId);
 		if (listener != null) {
 			listener.onUnityAdsPlacementStateChanged(placementId, oldState, newState);
@@ -60,11 +65,13 @@ public class UnityInterstitialCallbackRouter implements IUnityAdsExtendedListene
 
 	public void addListener(String placementId, IUnityAdsExtendedListener listener) {
 		listeners.put(placementId, listener);
+		MoPubLog.d("UnityRouter.getInterstitialRouter().addListener() for: "+placementId);
 	}
 
 
 	public void removeListener(String placementId) {
 		listeners.remove(placementId);
+		MoPubLog.d("UnityRouter.getInterstitialRouter().removeListener() for: "+placementId);
 	}
 
 	public void setCurrentPlacementId(String placementId) {
