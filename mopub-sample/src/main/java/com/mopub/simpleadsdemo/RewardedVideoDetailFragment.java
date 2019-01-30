@@ -18,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import com.mopub.common.MoPub;
 import com.mopub.common.MoPubReward;
 
 import com.mopub.common.SdkConfiguration;
@@ -30,6 +31,8 @@ import com.mopub.mobileads.MoPubRewardedVideoManager.RequestParameters;
 import com.mopub.mobileads.MoPubRewardedVideos;
 
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -91,7 +94,7 @@ public class RewardedVideoDetailFragment extends Fragment implements MoPubReward
     private static boolean sRewardedVideoInitialized;
 
     // Include any custom event rewarded video classes, if available, for initialization.
-    private static final List<String> sNetworksToInit = new LinkedList<>();
+//    private static final List<String> sNetworksToInit = new LinkedList<>();
 
     @Nullable private Button mShowButton;
     @Nullable Map<String, RewardedVideoStatus> mAdUnitIdsMap = new HashMap<>();
@@ -116,7 +119,7 @@ public class RewardedVideoDetailFragment extends Fragment implements MoPubReward
             MoPubLog.d("call MoPub.initializeSdk()");
             MoPub.initializeSdk(getActivity(), new SdkConfiguration.Builder(
                     MAIN_ADUNIT)
-                            .withNetworksToInit(sNetworksToInit)
+//                            .withNetworksToInit(sNetworksToInit)
                     .withMediationSettings(new GooglePlayServicesRewardedVideo.GooglePlayServicesMediationSettings(null, null, TEST_DEVICE))
                     .build(), null);
             sRewardedVideoInitialized = true;

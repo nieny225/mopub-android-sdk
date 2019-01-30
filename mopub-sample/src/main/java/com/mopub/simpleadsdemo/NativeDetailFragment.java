@@ -50,8 +50,7 @@ public class NativeDetailFragment extends Fragment {
 
         if (!sNativeInitialized) {
             MoPub.initializeSdk(getActivity(), new SdkConfiguration.Builder(
-                    "91e4e8af17214dd5b45292f5d23d1705")
-                    .withAdvancedBidder(FacebookAdvancedBidder.class).build(), null);
+                    "91e4e8af17214dd5b45292f5d23d1705").build(), null);
             sNativeInitialized = true;
         }
 
