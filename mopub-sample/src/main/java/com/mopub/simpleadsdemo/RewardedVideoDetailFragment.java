@@ -1,4 +1,4 @@
-// Copyright 2018 Twitter, Inc.
+// Copyright 2018-2019 Twitter, Inc.
 // Licensed under the MoPub SDK License Agreement
 // http://www.mopub.com/legal/sdk-license-agreement/
 
@@ -18,19 +18,18 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
-import com.mopub.common.MoPub;
 import com.mopub.common.MoPubReward;
+
 import com.mopub.common.SdkConfiguration;
 import com.mopub.common.logging.MoPubLog;
 import com.mopub.mobileads.GooglePlayServicesRewardedVideo;
+
 import com.mopub.mobileads.MoPubErrorCode;
 import com.mopub.mobileads.MoPubRewardedVideoListener;
 import com.mopub.mobileads.MoPubRewardedVideoManager.RequestParameters;
 import com.mopub.mobileads.MoPubRewardedVideos;
 
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -39,6 +38,7 @@ import static com.mopub.simpleadsdemo.Utils.hideSoftKeyboard;
 import static com.mopub.simpleadsdemo.Utils.logToast;
 
 public class RewardedVideoDetailFragment extends Fragment implements MoPubRewardedVideoListener {
+
 
     public static final String TEST_DEVICE = "7115E6D528724F23A775699CCC2C563B";
 
@@ -92,6 +92,7 @@ public class RewardedVideoDetailFragment extends Fragment implements MoPubReward
 
     // Include any custom event rewarded video classes, if available, for initialization.
     private static final List<String> sNetworksToInit = new LinkedList<>();
+
     @Nullable private Button mShowButton;
     @Nullable Map<String, RewardedVideoStatus> mAdUnitIdsMap = new HashMap<>();
 
@@ -120,6 +121,7 @@ public class RewardedVideoDetailFragment extends Fragment implements MoPubReward
                     .build(), null);
             sRewardedVideoInitialized = true;
         }
+
         MoPubRewardedVideos.setRewardedVideoListener(this);
 
         mAdUnitIdsMap.put(MAIN_ADUNIT, RewardedVideoStatus.EMPTY);
