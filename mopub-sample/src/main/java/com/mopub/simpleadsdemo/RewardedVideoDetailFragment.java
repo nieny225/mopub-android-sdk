@@ -50,28 +50,31 @@ public class RewardedVideoDetailFragment extends Fragment implements MoPubReward
 
 
 
-//    //IronSource
-//    public static final String MAIN_ADUNIT = "cbabcb1e686e49feaca614d8da3eb5de";
-//    public static final String BACKFILL_ADUNIT = "d354146f26f04d35a1571faad397e303";
+    //IronSource
+    public static final String MAIN_ADUNIT = "cbabcb1e686e49feaca614d8da3eb5de";
+    public static final String BACKFILL_ADUNIT = "d354146f26f04d35a1571faad397e303";
 //    //Unity
 //    public static final String MAIN_ADUNIT = "8d2de5a1aa4a4b278a6c24ff4930a6e3";
 //    public static final String BACKFILL_ADUNIT = "20ac22127e13402d90662b77d2935467";
-    //FAN
-    public static final String MAIN_ADUNIT = "0977449dba0b4713924850c19e064674";
-    public static final String BACKFILL_ADUNIT = "9612a8755deb4af6b30ff3798b1858ae";
+//    //FAN
+//    public static final String MAIN_ADUNIT = "0977449dba0b4713924850c19e064674";
+//    public static final String BACKFILL_ADUNIT = "9612a8755deb4af6b30ff3798b1858ae";
 //    //Vungle
 //    public static final String MAIN_ADUNIT = "cb4f5c64766c41d792e4fa9bc2882ab4";
 //    public static final String BACKFILL_ADUNIT = "37630b6d51e64acd81f1afef2e93e7a6";
 
 //    //AppLovin
-//    public static final String MAIN_ADUNIT = "4df0dafdc60c4e2bbf06479777622769";
-//    public static final String BACKFILL_ADUNIT = "3d761d17a3344bc4ad6df27b4caf3ff8";
+//    public static final String MAIN_ADUNIT = "b28c982f77dd4c68a9e36ab7a1a87c1a";
+//    public static final String BACKFILL_ADUNIT = "6252594cb2254985a4f68857e27cd085";
 
 //    //AdColony
 //    public static final String MAIN_ADUNIT = "0914022073904368a57abd3d2085cf87";
 //    public static final String BACKFILL_ADUNIT = "075888c31b4647359367c6c940d1c9b6";
 
-
+    //Tapjoy
+//    public static final String MAIN_ADUNIT = "4b713d8809bc43c082bb7863e7e18c61";
+//    public static final String BACKFILL_ADUNIT = "8c302503c31441489badd6408d2c78e6";
+//
 //    //    HK707 Vungle
 //    public static final String MAIN_ADUNIT = "0914022073904368a57abd3d2085cf87";
 //    public static final String BACKFILL_ADUNIT = "ad51e6e6c65142aea2dd3e87397382fe";
