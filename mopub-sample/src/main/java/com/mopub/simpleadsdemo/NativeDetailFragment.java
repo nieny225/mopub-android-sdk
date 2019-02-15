@@ -142,21 +142,29 @@ public class NativeDetailFragment extends Fragment {
                 .privacyInformationIconImageId(R.id.native_privacy_information_icon_image)
                 .build();
 
-        // Set up a renderer for a static native ad.
-        final MoPubStaticNativeAdRenderer moPubStaticNativeAdRenderer = new MoPubStaticNativeAdRenderer(staticViewBinder);
+        FacebookAdRenderer.FacebookViewBinder fbViewBinder = new FacebookAdRenderer.FacebookViewBinder.Builder(R.layout.fb_native_ad_list_item)
+                .titleId(R.id.native_title)
+                .textId(R.id.native_text)
+                .mediaViewId(R.id.native_media_layout)
+                .adIconViewId(R.id.native_icon_image)
+                .callToActionId(R.id.native_cta)
+                .adChoicesRelativeLayoutId(R.id.native_privacy_information_icon_image)
+                .build();
 
-        // Set up a renderer for a video native ad.
+        // Set up a renderer for a admob and facebook native ad.
+        final GooglePlayServicesAdRenderer googlePlayServicesAdRenderer = new GooglePlayServicesAdRenderer(videoViewBinder);
+        final FacebookAdRenderer facebookAdRenderer = new FacebookAdRenderer(fbViewBinder);
+
+        // Set up a renderer for a mopub static native ad.
+        final MoPubStaticNativeAdRenderer moPubStaticNativeAdRenderer = new MoPubStaticNativeAdRenderer(staticViewBinder);
+        // Set up a renderer for a mopub video native ad.
         final MoPubVideoNativeAdRenderer moPubVideoNativeAdRenderer = new MoPubVideoNativeAdRenderer(videoViewBinder);
 
-        final GooglePlayServicesAdRenderer googlePlayServicesAdRenderer = new GooglePlayServicesAdRenderer(videoViewBinder);
-
-        final FacebookAdRenderer facebookAdRenderer = new FacebookAdRenderer(staticViewBinder);
+        //Register networks renders first before registering mopub's
         moPubNative.registerAdRenderer(googlePlayServicesAdRenderer);
         moPubNative.registerAdRenderer(facebookAdRenderer);
         moPubNative.registerAdRenderer(moPubStaticNativeAdRenderer);
         moPubNative.registerAdRenderer(moPubVideoNativeAdRenderer);
-
-//        moPubNative.registerAdRenderer(facebookAdRenderer);
 
         adapterHelper = new AdapterHelper(getActivity(), 0, 3); // When standalone, any range will be fine.
 
