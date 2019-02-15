@@ -190,8 +190,12 @@ public class GooglePlayServicesRewardedVideo extends CustomEventRewardedVideo im
 
                 if (mRewardedVideoAd == null) {
                     mRewardedVideoAd = MobileAds.getRewardedVideoAdInstance(activity);
+//                    mRewardedVideoAd.isLoaded();
                     mRewardedVideoAd.setRewardedVideoAdListener(GooglePlayServicesRewardedVideo.this);
                 }
+
+
+
 
                 if (mRewardedVideoAd.isLoaded()) {
                     MoPubRewardedVideoManager

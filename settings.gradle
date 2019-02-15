@@ -4,8 +4,8 @@
 
 rootProject.name = 'mopub-android'
 include ':mopub-sample'
-//include ':mopub-sdk', ':mopub-sample', ':mopub-sdk:mopub-sdk-base', ':mopub-sdk:mopub-sdk-banner',
-//        ':mopub-sdk:mopub-sdk-interstitial', ':mopub-sdk:mopub-sdk-rewardedvideo',
-//        ':mopub-sdk:mopub-sdk-native-static', ':mopub-sdk:mopub-sdk-native-video'
+include ':mopub-sdk', ':mopub-sample', ':mopub-sdk:mopub-sdk-base', ':mopub-sdk:mopub-sdk-banner',
+        ':mopub-sdk:mopub-sdk-interstitial', ':mopub-sdk:mopub-sdk-rewardedvideo',
+        ':mopub-sdk:mopub-sdk-native-static', ':mopub-sdk:mopub-sdk-native-video'
 
 

@@ -45,23 +45,27 @@ public class RewardedVideoDetailFragment extends Fragment implements MoPubReward
 
     public static final String TEST_DEVICE = "7115E6D528724F23A775699CCC2C563B";
 
-//    //AdMob - problem
+    //AdMob - problem
 //    public static final String MAIN_ADUNIT = "b066f1f396854604b42fadb33f9d4cca"; //ca-app-pub-2687325649049316/5470206929
 //    public static final String BACKFILL_ADUNIT = "fa22094978944adfa143aa2b2f129ccd"; // ca-app-pub-2687325649049316/5657198740
 //    public static final String BACKFILL_ADUNIT = "db91dfca1d5e4ae2a54e3fadf23bedeb"; //ca-app-pub-2687325649049316/5470206929
-//    public static final String BACKFILL_ADUNIT = "b066f1f396854604b42fadb33f9d4cca"; // Queue the same ad unit
+
+//    //AdMob - same ad units
+//    public static final String MAIN_ADUNIT = "faef74616c604395bbf155138b9d0185";
+//    public static final String BACKFILL_ADUNIT = "faef74616c604395bbf155138b9d0185"; // Queue the same ad unit
 
 
 
-    //IronSource
-    public static final String MAIN_ADUNIT = "cbabcb1e686e49feaca614d8da3eb5de";
-    public static final String BACKFILL_ADUNIT = "d354146f26f04d35a1571faad397e303";
+//    //IronSource
+//    public static final String MAIN_ADUNIT = "cbabcb1e686e49feaca614d8da3eb5de";
+//    public static final String BACKFILL_ADUNIT = "d354146f26f04d35a1571faad397e303";
 //    //Unity
 //    public static final String MAIN_ADUNIT = "8d2de5a1aa4a4b278a6c24ff4930a6e3";
 //    public static final String BACKFILL_ADUNIT = "20ac22127e13402d90662b77d2935467";
-//    //FAN
-//    public static final String MAIN_ADUNIT = "0977449dba0b4713924850c19e064674";
+    //FAN
+    public static final String MAIN_ADUNIT = "0977449dba0b4713924850c19e064674";
 //    public static final String BACKFILL_ADUNIT = "9612a8755deb4af6b30ff3798b1858ae";
+public static final String BACKFILL_ADUNIT = "0977449dba0b4713924850c19e064674";
 //    //Vungle
 //    public static final String MAIN_ADUNIT = "cb4f5c64766c41d792e4fa9bc2882ab4";
 //    public static final String BACKFILL_ADUNIT = "37630b6d51e64acd81f1afef2e93e7a6";
@@ -121,6 +125,7 @@ public class RewardedVideoDetailFragment extends Fragment implements MoPubReward
                     MAIN_ADUNIT)
 //                            .withNetworksToInit(sNetworksToInit)
                     .withMediationSettings(new GooglePlayServicesRewardedVideo.GooglePlayServicesMediationSettings(null, null, TEST_DEVICE))
+                    .withLogLevel(MoPubLog.LogLevel.DEBUG)
                     .build(), null);
             sRewardedVideoInitialized = true;
         }
@@ -168,11 +173,11 @@ public class RewardedVideoDetailFragment extends Fragment implements MoPubReward
 
     private void loadAd() {
         for (String id : mAdUnitIdsMap.keySet()) {
-            if (mAdUnitIdsMap.get(id) == RewardedVideoStatus.EMPTY) {
+//            if (mAdUnitIdsMap.get(id) == RewardedVideoStatus.EMPTY) {
                 MoPubRewardedVideos.loadRewardedVideo(id);
                 mAdUnitIdsMap.put(id, RewardedVideoStatus.LOADING);
 //                logToast(getActivity(), "Load ad: " + id);
-            }
+//            }
         }
 
     }
