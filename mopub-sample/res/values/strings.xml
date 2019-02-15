@@ -26,6 +26,6 @@
     <string name="ad_unit_id_interstitial">facfc5e6d36d45329fbaf228e2cd4a36</string>
     <string name="ad_unit_id_rewarded_video">44debba1b0ff484485ef6ebda98b67cb</string>
     <string name="ad_unit_id_rewarded_rich_media">44debba1b0ff484485ef6ebda98b67cb</string>
-    <string name="ad_unit_id_native">11a17b188668469fb0412708c3d16813</string>
+    <string name="ad_unit_id_native">b2b67c2a8c0944eda272ed8e4ddf7ed4</string>
     <string name="swipe_text"><![CDATA[< Swipe Left & Right >]]></string>
 </resources>
