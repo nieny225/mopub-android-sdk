@@ -92,21 +92,24 @@ public class NativeListViewFragment extends Fragment {
                 .callToActionId(R.id.native_cta)
                 .privacyInformationIconImageId(R.id.native_privacy_information_icon_image)
                 .build();
-        // Set up a renderer that knows how to put ad data in your custom native view.
-        final MoPubStaticNativeAdRenderer staticAdRender = new MoPubStaticNativeAdRenderer(staticViewBinder);
 
-        // Set up a renderer for a video native ad.
-        final MoPubVideoNativeAdRenderer videoAdRenderer = new MoPubVideoNativeAdRenderer(
-                new MediaViewBinder.Builder(R.layout.video_ad_list_item)
+        MediaViewBinder mediaViewBinder = new MediaViewBinder.Builder(R.layout.video_ad_list_item)
                         .titleId(R.id.native_title)
                         .textId(R.id.native_text)
                         .mediaLayoutId(R.id.native_media_layout)
                         .iconImageId(R.id.native_icon_image)
                         .callToActionId(R.id.native_cta)
                         .privacyInformationIconImageId(R.id.native_privacy_information_icon_image)
-                        .build());
+                        .build();
 
-        final GooglePlayServicesAdRenderer googlePlayServicesAdRenderer = new GooglePlayServicesAdRenderer(staticViewBinder);
+
+        // Set up a renderer that knows how to put ad data in your custom native view.
+        final MoPubStaticNativeAdRenderer staticAdRender = new MoPubStaticNativeAdRenderer(staticViewBinder);
+
+        // Set up a renderer for a video native ad.
+        final MoPubVideoNativeAdRenderer videoAdRenderer = new MoPubVideoNativeAdRenderer(mediaViewBinder);
+
+        final GooglePlayServicesAdRenderer googlePlayServicesAdRenderer = new GooglePlayServicesAdRenderer(mediaViewBinder);
         // Register the renderers with the MoPubAdAdapter and then set the adapter on the ListView.
         mAdAdapter.registerAdRenderer(videoAdRenderer);
         mAdAdapter.registerAdRenderer(staticAdRender);

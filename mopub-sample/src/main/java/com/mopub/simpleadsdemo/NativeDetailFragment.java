@@ -18,6 +18,7 @@ import com.mopub.common.MoPub;
 import com.mopub.common.SdkConfiguration;
 import com.mopub.mobileads.FacebookAdvancedBidder;
 import com.mopub.nativeads.AdapterHelper;
+import com.mopub.nativeads.FacebookAdRenderer;
 import com.mopub.nativeads.GooglePlayServicesAdRenderer;
 import com.mopub.nativeads.MediaViewBinder;
 import com.mopub.nativeads.MoPubAdRenderer;
@@ -50,8 +51,7 @@ public class NativeDetailFragment extends Fragment {
 
         if (!sNativeInitialized) {
             MoPub.initializeSdk(getActivity(), new SdkConfiguration.Builder(
-                    "91e4e8af17214dd5b45292f5d23d1705")
-                    .withAdvancedBidder(FacebookAdvancedBidder.class).build(), null);
+                    "91e4e8af17214dd5b45292f5d23d1705").build(), null);
             sNativeInitialized = true;
         }
 
@@ -148,13 +148,14 @@ public class NativeDetailFragment extends Fragment {
         // Set up a renderer for a video native ad.
         final MoPubVideoNativeAdRenderer moPubVideoNativeAdRenderer = new MoPubVideoNativeAdRenderer(videoViewBinder);
 
-        final GooglePlayServicesAdRenderer googlePlayServicesAdRenderer = new GooglePlayServicesAdRenderer(staticViewBinder);
+        final GooglePlayServicesAdRenderer googlePlayServicesAdRenderer = new GooglePlayServicesAdRenderer(videoViewBinder);
 
-//        final FacebookAdRenderer facebookAdRenderer = new FacebookAdRenderer(staticViewBinder);
-
+        final FacebookAdRenderer facebookAdRenderer = new FacebookAdRenderer(staticViewBinder);
+        moPubNative.registerAdRenderer(googlePlayServicesAdRenderer);
+        moPubNative.registerAdRenderer(facebookAdRenderer);
         moPubNative.registerAdRenderer(moPubStaticNativeAdRenderer);
         moPubNative.registerAdRenderer(moPubVideoNativeAdRenderer);
-        moPubNative.registerAdRenderer(googlePlayServicesAdRenderer);
+
 //        moPubNative.registerAdRenderer(facebookAdRenderer);
 
         adapterHelper = new AdapterHelper(getActivity(), 0, 3); // When standalone, any range will be fine.

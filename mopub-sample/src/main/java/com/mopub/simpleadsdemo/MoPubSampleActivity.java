@@ -23,6 +23,7 @@ import com.mopub.common.privacy.ConsentStatus;
 import com.mopub.common.privacy.ConsentStatusChangeListener;
 import com.mopub.common.privacy.PersonalInfoManager;
 import com.mopub.common.util.DeviceUtils;
+import com.mopub.mobileads.FacebookAdvancedBidder;
 import com.mopub.mobileads.MoPubErrorCode;
 
 import java.util.ArrayList;
@@ -89,13 +90,21 @@ public class MoPubSampleActivity extends FragmentActivity {
             createMoPubListFragment(getIntent());
         }
 
-        final SdkConfiguration.Builder configBuilder = new SdkConfiguration.Builder("b195f8dd8ded45fe847ad89ed1d016da");
+
+//        SdkConfiguration sdkConfiguration = new SdkConfiguration.Builder("facfc5e6d36d45329fbaf228e2cd4a36")
+//                .withAdvancedBidder(FacebookAdvancedBidder.class)
+//                .build();
+//        MoPub.initializeSdk(this, sdkConfiguration, initSdkListener());
+
+
+        final SdkConfiguration.Builder configBuilder = new SdkConfiguration.Builder("facfc5e6d36d45329fbaf228e2cd4a36");
         if (BuildConfig.DEBUG) {
             configBuilder.withLogLevel(DEBUG);
         } else {
             configBuilder.withLogLevel(INFO);
         }
         MoPub.initializeSdk(this, configBuilder.build(), initSdkListener());
+
 
         mConsentStatusChangeListener = initConsentChangeListener();
         mPersonalInfoManager = MoPub.getPersonalInformationManager();

@@ -221,8 +221,10 @@ public class MultiAdResponse implements Iterator<AdResponse> {
 
         String adTypeString = extractHeader(jsonHeaders, ResponseHeader.AD_TYPE);
         String fullAdTypeString = extractHeader(jsonHeaders, ResponseHeader.FULL_AD_TYPE);
+        String adGroupIdString = extractHeader(jsonHeaders, ResponseHeader.AD_GROUP_ID);
         builder.setAdType(adTypeString);
         builder.setFullAdType(fullAdTypeString);
+        builder.setAdGroupId(adGroupIdString);
 
         // In the case of a CLEAR response, the REFRESH_TIME header must still be respected. Ensure
         // that it is parsed and passed along to the MoPubNetworkError.

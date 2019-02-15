@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "359324785281",
+    "firebase_url": "https://mopub-demo-app.firebaseio.com",
+    "project_id": "mopub-demo-app",
+    "storage_bucket": "mopub-demo-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:359324785281:android:625e2cdd97947bbf",
+        "android_client_info": {
+          "package_name": "com.mopub.simpleadsdemo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "359324785281-k447d959c46qr7kaugp8shhi0msgndlv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBCXQNjpJYJG6jhX3eYGn7FYkCLqfzne5k"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
