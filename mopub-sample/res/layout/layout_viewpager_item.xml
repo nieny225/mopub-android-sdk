@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <ImageView
+
+        android:id="@+id/li_imageview"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:background="@android:color/holo_blue_dark"
+        android:scaleType="fitXY" />
+
+      <TextView
+          android:id="@+id/li_textview"
+          android:layout_width="wrap_content"
+          android:textSize="50sp"
+          android:layout_gravity="center"
+          tools:text = "1"
+          android:layout_height="wrap_content" />
+</FrameLayout>
