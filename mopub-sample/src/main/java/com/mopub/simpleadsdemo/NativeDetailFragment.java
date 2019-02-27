@@ -16,7 +16,6 @@ import android.widget.TextView;
 
 import com.mopub.common.MoPub;
 import com.mopub.common.SdkConfiguration;
-import com.mopub.mobileads.FacebookAdvancedBidder;
 import com.mopub.nativeads.AdapterHelper;
 import com.mopub.nativeads.GooglePlayServicesAdRenderer;
 import com.mopub.nativeads.MediaViewBinder;
@@ -50,8 +49,7 @@ public class NativeDetailFragment extends Fragment {
 
         if (!sNativeInitialized) {
             MoPub.initializeSdk(getActivity(), new SdkConfiguration.Builder(
-                    "91e4e8af17214dd5b45292f5d23d1705")
-                    .withAdvancedBidder(FacebookAdvancedBidder.class).build(), null);
+                    "91e4e8af17214dd5b45292f5d23d1705").build(), null);
             sNativeInitialized = true;
         }
 
