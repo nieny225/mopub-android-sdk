@@ -79,6 +79,7 @@ public class FacebookRewardedVideo extends CustomEventRewardedVideo implements R
         if (requiresInitialization) {
             AudienceNetworkAds.initialize(launcherActivity);
         }
+        AdSettings.addTestDevice("40fc875a-ce0b-492f-93da-b06f511f2cf3");
         return requiresInitialization;
     }
 
