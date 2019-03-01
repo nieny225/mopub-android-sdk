@@ -101,9 +101,9 @@ dependencies {
     implementation 'com.google.android.gms:play-services-ads:17.1.2'
 //    implementation 'com.mopub.mediation:admob:17.1.2.2'
 
-// Facebook Audience Network
+    // Facebook Audience Network
     implementation 'com.facebook.android:audience-network-sdk:5.1.0'
-//    implementation 'com.mopub.mediation:facebookaudiencenetwork:5.1.0.0'
+//    implementation 'com.mopub.mediation:facebookaudiencenetwork:5.1.0.2'
 
 // Tapjoy
     implementation 'com.tapjoy:tapjoy-android-sdk:12.2.0@aar'
