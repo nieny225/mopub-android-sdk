@@ -14,12 +14,14 @@ import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.google.android.gms.ads.formats.NativeAdOptions;
 import com.mopub.common.MoPub;
 import com.mopub.common.SdkConfiguration;
 import com.mopub.mobileads.FacebookAdvancedBidder;
 import com.mopub.nativeads.AdapterHelper;
 import com.mopub.nativeads.FacebookAdRenderer;
 import com.mopub.nativeads.GooglePlayServicesAdRenderer;
+import com.mopub.nativeads.GooglePlayServicesNative;
 import com.mopub.nativeads.MediaViewBinder;
 import com.mopub.nativeads.MoPubAdRenderer;
 import com.mopub.nativeads.MoPubNative;
@@ -33,6 +35,7 @@ import com.mopub.nativeads.RequestParameters;
 import com.mopub.nativeads.ViewBinder;
 
 import java.util.EnumSet;
+import java.util.HashMap;
 
 import static com.mopub.nativeads.RequestParameters.NativeAdAsset;
 
@@ -140,7 +143,10 @@ public class NativeDetailFragment extends Fragment {
                 .iconImageId(R.id.native_icon_image)
                 .callToActionId(R.id.native_cta)
                 .privacyInformationIconImageId(R.id.native_privacy_information_icon_image)
+                .addExtra(GooglePlayServicesAdRenderer.VIEW_BINDER_KEY_AD_CHOICES_ICON_CONTAINER,
+                        R.id.native_ad_choices_icon_container)
                 .build();
+
 
         FacebookAdRenderer.FacebookViewBinder fbViewBinder = new FacebookAdRenderer.FacebookViewBinder.Builder(R.layout.fb_native_ad_list_item)
                 .titleId(R.id.native_title)
@@ -153,16 +159,20 @@ public class NativeDetailFragment extends Fragment {
 
         // Set up a renderer for a admob and facebook native ad.
         final GooglePlayServicesAdRenderer googlePlayServicesAdRenderer = new GooglePlayServicesAdRenderer(videoViewBinder);
-        final FacebookAdRenderer facebookAdRenderer = new FacebookAdRenderer(fbViewBinder);
+//        final FacebookAdRenderer facebookAdRenderer = new FacebookAdRenderer(fbViewBinder);
 
         // Set up a renderer for a mopub static native ad.
         final MoPubStaticNativeAdRenderer moPubStaticNativeAdRenderer = new MoPubStaticNativeAdRenderer(staticViewBinder);
         // Set up a renderer for a mopub video native ad.
         final MoPubVideoNativeAdRenderer moPubVideoNativeAdRenderer = new MoPubVideoNativeAdRenderer(videoViewBinder);
 
+        HashMap<String, Object> extras = new HashMap<>();
+        extras.put(GooglePlayServicesNative.KEY_EXTRA_AD_CHOICES_PLACEMENT, NativeAdOptions.ADCHOICES_BOTTOM_RIGHT);
+        moPubNative.setLocalExtras(extras);
+
         //Register networks renders first before registering mopub's
         moPubNative.registerAdRenderer(googlePlayServicesAdRenderer);
-        moPubNative.registerAdRenderer(facebookAdRenderer);
+//        moPubNative.registerAdRenderer(facebookAdRenderer);
         moPubNative.registerAdRenderer(moPubStaticNativeAdRenderer);
         moPubNative.registerAdRenderer(moPubVideoNativeAdRenderer);
 
