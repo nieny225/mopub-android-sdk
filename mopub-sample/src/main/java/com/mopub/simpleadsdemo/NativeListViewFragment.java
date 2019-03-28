@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.mopub.nativeads.FacebookAdRenderer;
 import com.mopub.nativeads.GooglePlayServicesAdRenderer;
 import com.mopub.nativeads.MediaViewBinder;
 import com.mopub.nativeads.MoPubAdAdapter;
@@ -106,11 +107,41 @@ public class NativeListViewFragment extends Fragment {
                         .privacyInformationIconImageId(R.id.native_privacy_information_icon_image)
                         .build());
 
-        final GooglePlayServicesAdRenderer googlePlayServicesAdRenderer = new GooglePlayServicesAdRenderer(staticViewBinder);
-        // Register the renderers with the MoPubAdAdapter and then set the adapter on the ListView.
-        mAdAdapter.registerAdRenderer(videoAdRenderer);
-        mAdAdapter.registerAdRenderer(staticAdRender);
+        MediaViewBinder videoViewBinder = new MediaViewBinder.Builder(R.layout.video_ad_list_item)
+                .titleId(R.id.native_title)
+                .textId(R.id.native_text)
+                .mediaLayoutId(R.id.native_media_layout)
+                .iconImageId(R.id.native_icon_image)
+                .callToActionId(R.id.native_cta)
+                .privacyInformationIconImageId(R.id.native_privacy_information_icon_image)
+                .addExtra("ad_choices_container",
+                        R.id.native_ad_choices_icon_container)
+                .build();
+
+
+        FacebookAdRenderer.FacebookViewBinder fbViewBinder = new FacebookAdRenderer.FacebookViewBinder.Builder(R.layout.fb_native_ad_list_item)
+                .titleId(R.id.native_title)
+                .textId(R.id.native_text)
+                .mediaViewId(R.id.native_media_layout)
+                .adIconViewId(R.id.native_icon_image)
+                .callToActionId(R.id.native_cta)
+                .adChoicesRelativeLayoutId(R.id.native_privacy_information_icon_image)
+                .build();
+
+        // Set up a renderer for a admob and facebook native ad.
+        final GooglePlayServicesAdRenderer googlePlayServicesAdRenderer = new GooglePlayServicesAdRenderer(videoViewBinder);
+        final FacebookAdRenderer facebookAdRenderer = new FacebookAdRenderer(fbViewBinder);
+
+        // Set up a renderer for a mopub static native ad.
+        final MoPubStaticNativeAdRenderer moPubStaticNativeAdRenderer = new MoPubStaticNativeAdRenderer(staticViewBinder);
+        // Set up a renderer for a mopub video native ad.
+        final MoPubVideoNativeAdRenderer moPubVideoNativeAdRenderer = new MoPubVideoNativeAdRenderer(videoViewBinder);
+
+        //Register networks renders first before registering mopub's
         mAdAdapter.registerAdRenderer(googlePlayServicesAdRenderer);
+        mAdAdapter.registerAdRenderer(facebookAdRenderer);
+        mAdAdapter.registerAdRenderer(moPubStaticNativeAdRenderer);
+        mAdAdapter.registerAdRenderer(moPubVideoNativeAdRenderer);
         listView.setAdapter(mAdAdapter);
 
         mAdAdapter.loadAds(mAdConfiguration.getAdUnitId(), mRequestParameters);
