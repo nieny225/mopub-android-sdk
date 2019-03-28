@@ -16,7 +16,6 @@ import com.mopub.common.VisibleForTesting;
 import com.mopub.common.logging.MoPubLog;
 import com.mopub.mobileads.AdViewController;
 import com.mopub.mobileads.CustomEventBanner;
-import com.mopub.mobileads.InternalCustomEventBannerListener;
 import com.mopub.mobileads.factories.MraidControllerFactory;
 import com.mopub.mraid.MraidController.MraidListener;
 
@@ -38,7 +37,7 @@ class MraidBanner extends CustomEventBanner {
     public static final String ADAPTER_NAME = MraidBanner.class.getSimpleName();
 
     @Nullable private MraidController mMraidController;
-    @Nullable private InternalCustomEventBannerListener mBannerListener;
+    @Nullable private CustomEventBannerListener mBannerListener;
     @Nullable private MraidWebViewDebugListener mDebugListener;
     @Nullable private ExternalViewabilitySessionManager mExternalViewabilitySessionManager;
     private boolean mBannerImpressionPixelCountEnabled = false;
@@ -48,16 +47,7 @@ class MraidBanner extends CustomEventBanner {
                     @NonNull final CustomEventBannerListener customEventBannerListener,
                     @NonNull final Map<String, Object> localExtras,
                     @NonNull final Map<String, String> serverExtras) {
-        try {
-            mBannerListener = (InternalCustomEventBannerListener) customEventBannerListener;
-        } catch (ClassCastException e) {
-            MoPubLog.log(LOAD_FAILED, ADAPTER_NAME,
-                    MRAID_LOAD_ERROR.getIntCode(),
-                    MRAID_LOAD_ERROR);
-            customEventBannerListener.onBannerFailed(MRAID_LOAD_ERROR);
-            return;
-        }
-
+        mBannerListener = customEventBannerListener;
         MoPubLog.log(LOAD_ATTEMPTED, ADAPTER_NAME);
 
         String htmlData;
@@ -112,15 +102,6 @@ class MraidBanner extends CustomEventBanner {
             public void onExpand() {
                 mBannerListener.onBannerExpanded();
                 mBannerListener.onBannerClicked();
-            }
-
-            @Override
-            public void onResize(final boolean toOriginalSize) {
-                if (toOriginalSize) {
-                    mBannerListener.onResumeAutoRefresh();
-                } else {
-                    mBannerListener.onPauseAutoRefresh();
-                }
             }
 
             @Override

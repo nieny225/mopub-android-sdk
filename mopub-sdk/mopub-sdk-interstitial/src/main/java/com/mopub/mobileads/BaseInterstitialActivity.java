@@ -70,11 +70,6 @@ abstract class BaseInterstitialActivity extends Activity {
         return mBroadcastIdentifier;
     }
 
-    @Nullable
-    String getResponseString() {
-        return getResponseString(mAdReport);
-    }
-
     protected void showInterstitialCloseButton() {
         if (mCloseableLayout != null) {
             mCloseableLayout.setCloseVisible(true);
@@ -101,10 +96,5 @@ abstract class BaseInterstitialActivity extends Activity {
         } catch (ClassCastException e) {
             return null;
         }
-    }
-
-    @Nullable
-    static String getResponseString(AdReport adReport) {
-        return adReport != null ? adReport.getResponseString() : null;
     }
 }

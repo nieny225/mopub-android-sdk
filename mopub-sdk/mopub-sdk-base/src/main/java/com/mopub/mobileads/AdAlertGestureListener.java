@@ -30,14 +30,11 @@ public class AdAlertGestureListener extends GestureDetector.SimpleOnGestureListe
 
     private View mView;
 
-    boolean mIsClicked;
-
     AdAlertGestureListener(View view, @Nullable AdReport adReport) {
         super();
         if (view != null && view.getWidth() > 0) {
             mCurrentThresholdInDips = Math.min(MAXIMUM_THRESHOLD_X_IN_DIPS, view.getWidth() / 3f);
         }
-        mIsClicked = false;
         mView = view;
         mAdReport = adReport;
     }
@@ -50,7 +47,7 @@ public class AdAlertGestureListener extends GestureDetector.SimpleOnGestureListe
 
         // e1 is always the initial touch down event.
         // e2 is the true motion event
-        if (isTouchOutOfBoundsOnYAxis(e1, e2)) {
+        if (isTouchOutOfBoundsOnYAxis(e1.getY(), e2.getY())) {
             mCurrentZigZagState = ZigZagState.FAILED;
             return super.onScroll(e1, e2, distanceX, distanceY);
         }
@@ -90,12 +87,7 @@ public class AdAlertGestureListener extends GestureDetector.SimpleOnGestureListe
         mCurrentZigZagState = ZigZagState.UNSET;
     }
 
-    private boolean isTouchOutOfBoundsOnYAxis(MotionEvent e1, MotionEvent e2) {
-        if (e1 == null || e2 == null) {
-            return false;
-        }
-        final float initialY = e1.getY();
-        final float currentY = e2.getY();
+    private boolean isTouchOutOfBoundsOnYAxis(float initialY, float currentY) {
         return (Math.abs(currentY - initialY) > MAXIMUM_THRESHOLD_Y_IN_DIPS);
     }
 
@@ -177,19 +169,5 @@ public class AdAlertGestureListener extends GestureDetector.SimpleOnGestureListe
     @Deprecated // for testing
     AdAlertReporter getAdAlertReporter(){
         return mAdAlertReporter;
-    }
-
-    void onResetUserClick() {
-        mIsClicked = false;
-    }
-
-    boolean isClicked() {
-        return mIsClicked;
-    }
-
-    @Override
-    public boolean onSingleTapUp(MotionEvent e) {
-        mIsClicked = true;
-        return super.onSingleTapUp(e);
     }
 }

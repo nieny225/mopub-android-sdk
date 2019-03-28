@@ -31,8 +31,6 @@ dependencies {
 }
 
 android {
-    useLibrary 'org.apache.http.legacy'
-
     testOptions {
         unitTests {
             includeAndroidResources = true

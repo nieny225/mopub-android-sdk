@@ -26,7 +26,6 @@ import com.mopub.mobileads.MoPubErrorCode;
 import static com.mopub.common.logging.MoPubLog.ConsentLogEvent.SHOW_FAILED;
 import static com.mopub.common.logging.MoPubLog.ConsentLogEvent.SHOW_SUCCESS;
 import static com.mopub.common.logging.MoPubLog.SdkLogEvent.CUSTOM;
-import static com.mopub.common.logging.MoPubLog.SdkLogEvent.CUSTOM_WITH_THROWABLE;
 
 public class ConsentDialogActivity extends Activity {
     private static final int CLOSE_BUTTON_DELAY_MS = 10000;
@@ -89,17 +88,7 @@ public class ConsentDialogActivity extends Activity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-        try {
-            mView = new ConsentDialogLayout(this);
-        } catch (RuntimeException e) {
-            // Notably, android.webkit.WebViewFactory$MissingWebViewPackageException
-            MoPubLog.log(CUSTOM_WITH_THROWABLE, "Unable to create WebView", e);
-            MoPubLog.log(SHOW_FAILED, MoPubErrorCode.INTERNAL_ERROR.getIntCode(),
-                    MoPubErrorCode.INTERNAL_ERROR);
-            finish();
-            return;
-        }
-
+        mView = new ConsentDialogLayout(this);
         mView.setConsentClickListener(new ConsentDialogLayout.ConsentListener() {
             @Override
             public void onConsentClick(ConsentStatus status) {

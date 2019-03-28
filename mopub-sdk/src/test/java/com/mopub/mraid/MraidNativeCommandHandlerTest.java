@@ -76,7 +76,6 @@ import static org.mockito.Mockito.when;
 public class MraidNativeCommandHandlerTest {
     private static final String IMAGE_URI_VALUE = "file://tmp/expectedFile.jpg";
     private static final String REMOTE_IMAGE_URL = "https://www.mopub.com/expectedFile.jpg";
-    private static final String FILE_PATH = "/tmp/expectedFile.jpg";
     private static final int TIME_TO_PAUSE_FOR_NETWORK = 300;
     private static final String FAKE_IMAGE_DATA = "imageFileData";
     //XXX: Robolectric or JUNIT doesn't support the correct suffix ZZZZZ in the parse pattern, so replacing xx:xx with xxxx for time.
@@ -99,7 +98,7 @@ public class MraidNativeCommandHandlerTest {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         TestDrawables.EXPECTED_FILE.getBitmap().compress(Bitmap.CompressFormat.JPEG, 100, baos);
-        FileUtils.writeBytesToFile(baos.toByteArray(), FILE_PATH);
+        FileUtils.writeBytesToFile(baos.toByteArray(), "/tmp/expectedFile.jpg");
 
         expectedFile = new File(Environment.getExternalStorageDirectory(), "Pictures" + separator + "expectedFile.jpg");
         pictureDirectory = new File(Environment.getExternalStorageDirectory(), "Pictures");
@@ -113,7 +112,6 @@ public class MraidNativeCommandHandlerTest {
     @After
     public void tearDown() {
         ShadowToast.reset();
-        assertThat(new File(FILE_PATH).delete()).isTrue();
     }
 
     @Test

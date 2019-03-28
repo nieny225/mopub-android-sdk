@@ -133,7 +133,6 @@ public class ConsentDialogController implements ConsentDialogRequest.Listener {
             return false;
         }
 
-        mReady = false;
         ConsentDialogActivity.start(mAppContext, mHtmlBody);
         resetState();
         return true;

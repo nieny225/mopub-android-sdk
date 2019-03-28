@@ -12,18 +12,27 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import com.mopub.common.AdReport;
-import com.mopub.common.VisibleForTesting;
+import com.mopub.common.logging.MoPubLog;
+
+import static com.mopub.common.logging.MoPubLog.SdkLogEvent.CUSTOM;
 
 public class ViewGestureDetector extends GestureDetector {
     private final View mView;
-    @NonNull
+
+    public interface UserClickListener {
+        void onUserClick();
+        void onResetUserClick();
+        boolean wasClicked();
+    }
+
     private AdAlertGestureListener mAdAlertGestureListener;
+    private UserClickListener mUserClickListener;
 
     public ViewGestureDetector(@NonNull Context context, @NonNull View view, @Nullable AdReport adReport)  {
         this(context, view, new AdAlertGestureListener(view, adReport));
     }
 
-    private ViewGestureDetector(Context context, View view, @NonNull AdAlertGestureListener adAlertGestureListener) {
+    private ViewGestureDetector(Context context, View view, AdAlertGestureListener adAlertGestureListener) {
         super(context, adAlertGestureListener);
 
         mAdAlertGestureListener = adAlertGestureListener;
@@ -32,16 +41,25 @@ public class ViewGestureDetector extends GestureDetector {
         setIsLongpressEnabled(false);
     }
 
-    @Override
-    public boolean onTouchEvent(MotionEvent motionEvent) {
-        final boolean result = super.onTouchEvent(motionEvent);
+    public void sendTouchEvent(MotionEvent motionEvent) {
         switch (motionEvent.getAction()) {
             case MotionEvent.ACTION_UP:
+                if (mUserClickListener != null) {
+                    mUserClickListener.onUserClick();
+                } else {
+                    MoPubLog.log(CUSTOM, "View's onUserClick() is not registered.");
+                }
                 mAdAlertGestureListener.finishGestureDetection();
                 break;
 
+            case MotionEvent.ACTION_DOWN:
+                onTouchEvent(motionEvent);
+                break;
+
             case MotionEvent.ACTION_MOVE:
-                if (!isMotionEventInView(motionEvent, mView)) {
+                if (isMotionEventInView(motionEvent, mView)) {
+                    onTouchEvent(motionEvent);
+                } else {
                     resetAdFlaggingGesture();
                 }
                 break;
@@ -49,7 +67,10 @@ public class ViewGestureDetector extends GestureDetector {
             default:
                 break;
         }
-        return result;
+    }
+
+    public void setUserClickListener(UserClickListener listener) {
+        mUserClickListener = listener;
     }
 
     void resetAdFlaggingGesture() {
@@ -68,21 +89,8 @@ public class ViewGestureDetector extends GestureDetector {
                 && (y >= 0 && y <= view.getHeight());
     }
 
-    public void onResetUserClick() {
-        mAdAlertGestureListener.onResetUserClick();
-    }
-
-    public boolean isClicked() {
-        return mAdAlertGestureListener.isClicked();
-    }
-
     @Deprecated // for testing
-    void setAdAlertGestureListener(@NonNull AdAlertGestureListener adAlertGestureListener) {
+    void setAdAlertGestureListener(AdAlertGestureListener adAlertGestureListener) {
         mAdAlertGestureListener = adAlertGestureListener;
-    }
-
-    @VisibleForTesting
-    public void setClicked(boolean clicked) {
-        mAdAlertGestureListener.mIsClicked = clicked;
     }
 }

@@ -80,9 +80,6 @@ public class MoPubIdentifier {
      */
     @NonNull
     public AdvertisingId getAdvertisingInfo() {
-        if (initialized) {
-            rotateMopubId();
-        }
         final AdvertisingId adInfo = mAdInfo;
         refreshAdvertisingInfo();
         return adInfo;
@@ -168,10 +165,6 @@ public class MoPubIdentifier {
     }
 
     void rotateMopubId() {
-        if (mAdInfo.mAdvertisingId.endsWith("10ca1ad1abe1")) {
-            MoPubLog.setLogLevel(MoPubLog.LogLevel.DEBUG);
-        }
-
         if (!mAdInfo.isRotationRequired()) {
             setAdvertisingInfo(mAdInfo);
             return;

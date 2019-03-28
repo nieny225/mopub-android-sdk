@@ -40,19 +40,16 @@ import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.google.android.exoplayer2.trackselection.TrackSelector;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultAllocator;
-import com.google.android.exoplayer2.upstream.DefaultHttpDataSource;
-import com.google.android.exoplayer2.upstream.cache.Cache;
-import com.google.android.exoplayer2.upstream.cache.CacheDataSource;
 import com.google.android.exoplayer2.video.MediaCodecVideoRenderer;
 
 import com.mopub.common.Preconditions;
-import com.mopub.common.VisibilityTracker.VisibilityChecker;
 import com.mopub.common.VisibleForTesting;
 import com.mopub.common.logging.MoPubLog;
 import com.mopub.mobileads.RepeatingHandlerRunnable;
 import com.mopub.mobileads.VastTracker;
 import com.mopub.mobileads.VastVideoConfig;
 import com.mopub.nativeads.NativeVideoController.NativeVideoProgressRunnable.ProgressListener;
+import com.mopub.common.VisibilityTracker.VisibilityChecker;
 import com.mopub.network.TrackingRequest;
 
 import java.lang.ref.WeakReference;
@@ -418,15 +415,7 @@ public class NativeVideoController extends ExoPlayer.DefaultEventListener implem
             final DataSource.Factory dataSourceFactory = new DataSource.Factory() {
                 @Override
                 public DataSource createDataSource() {
-                    DataSource dataSource = new DefaultHttpDataSource("exo_demo",
-                            null);
-                    final Cache cache = MoPubCache.getCacheInstance(mContext);
-
-                    if (cache != null) {
-                        dataSource = new CacheDataSource(cache, dataSource);
-                    }
-
-                    return dataSource;
+                    return new HttpDiskCompositeDataSource(mContext, "exo_demo");
                 }
             };
 

@@ -75,7 +75,7 @@ public class AdapterConfigurationManager implements AdapterConfigurationsInitial
     }
 
     @Nullable
-    public List<String> getAdapterConfigurationInfo() {
+    public List<String> getAdvancedBidderDetails() {
         final Map<String, AdapterConfiguration> adapterConfigurations = mAdapterConfigurations;
         if (adapterConfigurations == null || adapterConfigurations.isEmpty()) {
             return null;

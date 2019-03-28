@@ -10,7 +10,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
@@ -39,6 +38,7 @@ import java.io.Serializable;
 import static com.mopub.common.DataKeys.AD_REPORT_KEY;
 import static com.mopub.common.DataKeys.BROADCAST_IDENTIFIER_KEY;
 import static com.mopub.common.DataKeys.CREATIVE_ORIENTATION_KEY;
+import static com.mopub.common.DataKeys.HTML_RESPONSE_BODY_KEY;
 import static com.mopub.common.IntentActions.ACTION_INTERSTITIAL_CLICK;
 import static com.mopub.common.IntentActions.ACTION_INTERSTITIAL_DISMISS;
 import static com.mopub.common.IntentActions.ACTION_INTERSTITIAL_FAIL;
@@ -65,6 +65,7 @@ public class MraidActivity extends BaseInterstitialActivity {
     public static void preRenderHtml(@NonNull final Interstitial mraidInterstitial,
             @NonNull final Context context,
             @NonNull final CustomEventInterstitialListener customEventInterstitialListener,
+            @Nullable final String htmlData,
             @NonNull final Long broadcastIdentifier,
             @Nullable final AdReport adReport) {
         Preconditions.checkNotNull(mraidInterstitial);
@@ -72,7 +73,7 @@ public class MraidActivity extends BaseInterstitialActivity {
         Preconditions.checkNotNull(customEventInterstitialListener);
         Preconditions.checkNotNull(broadcastIdentifier);
 
-        preRenderHtml(mraidInterstitial, customEventInterstitialListener, getResponseString(adReport),
+        preRenderHtml(mraidInterstitial, customEventInterstitialListener, htmlData,
                 new MraidBridge.MraidWebView(context), broadcastIdentifier,
                 new MraidController(context, adReport, PlacementType.INTERSTITIAL));
     }
@@ -139,10 +140,11 @@ public class MraidActivity extends BaseInterstitialActivity {
 
     public static void start(@NonNull final Context context,
             @Nullable final AdReport adreport,
+            @Nullable final String htmlData,
             final long broadcastIdentifier,
             @Nullable final CreativeOrientation orientation) {
         MoPubLog.log(SHOW_ATTEMPTED);
-        final Intent intent = createIntent(context, adreport, broadcastIdentifier,
+        final Intent intent = createIntent(context, adreport, htmlData, broadcastIdentifier,
                 orientation);
         try {
             context.startActivity(intent);
@@ -156,9 +158,11 @@ public class MraidActivity extends BaseInterstitialActivity {
     @VisibleForTesting
     protected static Intent createIntent(@NonNull final Context context,
             @Nullable final AdReport adReport,
+            @Nullable final String htmlData,
             final long broadcastIdentifier,
             @Nullable final CreativeOrientation orientation) {
         Intent intent = new Intent(context, MraidActivity.class);
+        intent.putExtra(HTML_RESPONSE_BODY_KEY, htmlData);
         intent.putExtra(BROADCAST_IDENTIFIER_KEY, broadcastIdentifier);
         intent.putExtra(AD_REPORT_KEY, adReport);
         intent.putExtra(CREATIVE_ORIENTATION_KEY, orientation);
@@ -168,8 +172,8 @@ public class MraidActivity extends BaseInterstitialActivity {
 
     @Override
     public View getAdView() {
-        final String htmlData = getResponseString();
-        if (TextUtils.isEmpty(htmlData)) {
+        String htmlData = getIntent().getStringExtra(HTML_RESPONSE_BODY_KEY);
+        if (htmlData == null) {
             MoPubLog.log(CUSTOM, "MraidActivity received a null HTML body. Finishing the activity.");
             finish();
             return new View(this);
@@ -215,11 +219,6 @@ public class MraidActivity extends BaseInterstitialActivity {
 
             @Override
             public void onExpand() {
-                // No-op. The interstitial is always expanded.
-            }
-
-            @Override
-            public void onResize(final boolean toOriginalSize) {
                 // No-op. The interstitial is always expanded.
             }
 

@@ -17,14 +17,12 @@ import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
 import org.robolectric.annotation.Config;
 
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-
 import static org.fest.assertions.api.Assertions.assertThat;
 
 @RunWith(SdkTestRunner.class)
 public class NetworkingTest {
     private Activity context;
+    static volatile String sUserAgent;
 
     @Before
     public void setUp() {
@@ -34,6 +32,7 @@ public class NetworkingTest {
     @After
     public void tearDown() {
         Networking.clearForTesting();
+        sUserAgent = null;
     }
 
     @Test
@@ -60,27 +59,6 @@ public class NetworkingTest {
         String userAgent = Networking.getUserAgent(context);
 
         assertThat(userAgent).containsIgnoringCase("android");
-    }
-
-    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
-    @Config(sdk = Build.VERSION_CODES.JELLY_BEAN_MR1)
-    @Test
-    public void getUserAgent_withSdkVersionGreaterThan16_whenOnABackgroundThread_shouldReturnHttpAgent() throws InterruptedException {
-        final String[] userAgent = new String[1];
-        final CountDownLatch latch = new CountDownLatch(1);
-        new Thread() {
-            @Override
-            public void run() {
-                userAgent[0] = Networking.getUserAgent(context);
-
-                latch.countDown();
-            }
-        }.start();
-
-        latch.await(500, TimeUnit.MILLISECONDS);
-        // Robolectric's default http agent is null which gets rewritten to an empty String.
-        assertThat(userAgent[0]).isEqualTo("");
-
     }
 
     @Test
