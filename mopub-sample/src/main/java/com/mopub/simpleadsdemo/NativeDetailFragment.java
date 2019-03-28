@@ -17,7 +17,6 @@ import android.widget.TextView;
 import com.google.android.gms.ads.formats.NativeAdOptions;
 import com.mopub.common.MoPub;
 import com.mopub.common.SdkConfiguration;
-import com.mopub.mobileads.FacebookAdvancedBidder;
 import com.mopub.nativeads.AdapterHelper;
 import com.mopub.nativeads.FacebookAdRenderer;
 import com.mopub.nativeads.GooglePlayServicesAdRenderer;

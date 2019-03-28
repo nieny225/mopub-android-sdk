@@ -79,7 +79,8 @@ public class FacebookRewardedVideo extends CustomEventRewardedVideo implements R
         if (requiresInitialization) {
             AudienceNetworkAds.initialize(launcherActivity);
         }
-        AdSettings.addTestDevice("40fc875a-ce0b-492f-93da-b06f511f2cf3");
+
+
         return requiresInitialization;
     }
 
@@ -87,6 +88,9 @@ public class FacebookRewardedVideo extends CustomEventRewardedVideo implements R
     protected void loadWithSdkInitialized(@NonNull Activity activity, @NonNull Map<String, Object> localExtras, @NonNull Map<String, String> serverExtras) throws Exception {
         if (!serverExtras.isEmpty()) {
             mPlacementId = serverExtras.get("placement_id");
+
+            AdSettings.addTestDevice("b4ee80ba-4691-40dc-b379-abad4caf9ff1");
+
             mFacebookAdapterConfiguration.setCachedInitializationParameters(activity.getApplicationContext(), serverExtras);
 
             if (!TextUtils.isEmpty(mPlacementId)) {

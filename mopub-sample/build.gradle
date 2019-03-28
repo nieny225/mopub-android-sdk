@@ -61,7 +61,6 @@ android {
     // way that the existing SDK requires, using the sdk.dir property.
     // Alternatively, you can set an environment variable called ANDROID_HOME. There is no 
     // difference between the two methods, you can use the one you prefer.
-    buildToolsVersion '28.0.3'
 }
 
 dependencies {
@@ -103,7 +102,8 @@ dependencies {
 
 // Facebook Audience Network
     implementation 'com.facebook.android:audience-network-sdk:5.1.0'
-//    implementation 'com.mopub.mediation:facebookaudiencenetwork:5.1.0.0'
+//    implementation 'com.mopub.mediation:facebookaudiencenetwork:5.1.0.2'
+
 
 // Tapjoy
     implementation 'com.tapjoy:tapjoy-android-sdk:12.2.0@aar'
