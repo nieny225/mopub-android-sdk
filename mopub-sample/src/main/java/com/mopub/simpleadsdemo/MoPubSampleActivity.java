@@ -23,7 +23,10 @@ import com.mopub.common.privacy.ConsentStatus;
 import com.mopub.common.privacy.ConsentStatusChangeListener;
 import com.mopub.common.privacy.PersonalInfoManager;
 import com.mopub.common.util.DeviceUtils;
+<<<<<<< HEAD
 import com.mopub.mobileads.FacebookAdvancedBidder;
+=======
+>>>>>>> parent of 1ed949b... Merge remote-tracking branch 'upstream/master'
 import com.mopub.mobileads.MoPubErrorCode;
 
 import java.util.ArrayList;
