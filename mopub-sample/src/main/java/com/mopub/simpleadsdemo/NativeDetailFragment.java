@@ -149,9 +149,9 @@ public class NativeDetailFragment extends Fragment {
 
         final GooglePlayServicesAdRenderer googlePlayServicesAdRenderer = new GooglePlayServicesAdRenderer(videoViewBinder);
 
-        final FacebookAdRenderer facebookAdRenderer = new FacebookAdRenderer(staticViewBinder);
+//        final FacebookAdRenderer facebookAdRenderer = new FacebookAdRenderer(staticViewBinder);
         moPubNative.registerAdRenderer(googlePlayServicesAdRenderer);
-        moPubNative.registerAdRenderer(facebookAdRenderer);
+//        moPubNative.registerAdRenderer(facebookAdRenderer);
         moPubNative.registerAdRenderer(moPubStaticNativeAdRenderer);
         moPubNative.registerAdRenderer(moPubVideoNativeAdRenderer);
 
