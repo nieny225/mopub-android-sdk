@@ -533,15 +533,16 @@ public class MoPubRewardedVideoManager {
             }
 
             // Load custom event
+            //logging suggestion
             MoPubLog.log(CUSTOM, String.format(Locale.US,
-                    "Loading custom event with class name %s", customEventClassName));
+                    "Loading custom event with class name %s on %s", customEventClassName, adUnitId));
             customEvent.loadCustomEvent(mainActivity, localExtras, serverExtras);
 
             final String adNetworkId = customEvent.getAdNetworkId();
             mRewardedAdData.updateAdUnitCustomEventMapping(adUnitId, customEvent, adNetworkId);
         } catch (Exception e) {
             MoPubLog.log(CUSTOM, String.format(Locale.US,
-                    "Couldn't create custom event with class name %s", customEventClassName));
+                    "Couldn't create custom event with class name %s on %s", customEventClassName, adUnitId));
             failover(adUnitId, MoPubErrorCode.ADAPTER_CONFIGURATION_ERROR);
         }
     }
@@ -606,7 +607,9 @@ public class MoPubRewardedVideoManager {
     private void failover(@NonNull final String adUnitId, @NonNull final MoPubErrorCode errorCode) {
         Preconditions.checkNotNull(adUnitId);
         Preconditions.checkNotNull(errorCode);
-
+        //logging suggestion
+        MoPubLog.log(CUSTOM, String.format(Locale.US,
+                "fail over on %s due to %s", adUnitId, errorCode));
         if (rewardedAdsLoaders.hasMoreAds(adUnitId) && !errorCode.equals(EXPIRED)) {
             loadVideo(adUnitId, "", errorCode);
         } else if (sInstance.mVideoListener != null) {

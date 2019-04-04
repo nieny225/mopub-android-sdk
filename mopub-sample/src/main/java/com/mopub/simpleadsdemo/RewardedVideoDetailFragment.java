@@ -13,6 +13,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -45,6 +46,11 @@ public class RewardedVideoDetailFragment extends Fragment implements MoPubReward
 
     public static final String TEST_DEVICE = "7115E6D528724F23A775699CCC2C563B";
 
+    //Aladinfun
+//    public static final String MAIN_ADUNIT = "ea59fe62286046c5bbf614d2fafa8031";//c87f9c371c39493eb6b50b0225c07e63
+//    public static final String BACKFILL_ADUNIT = "c87f9c371c39493eb6b50b0225c07e63";//ea59fe62286046c5bbf614d2fafa8031
+
+
     //AdMob - problem
 //    public static final String MAIN_ADUNIT = "b066f1f396854604b42fadb33f9d4cca"; //ca-app-pub-2687325649049316/5470206929
 //    public static final String BACKFILL_ADUNIT = "fa22094978944adfa143aa2b2f129ccd"; // ca-app-pub-2687325649049316/5657198740
@@ -63,9 +69,11 @@ public class RewardedVideoDetailFragment extends Fragment implements MoPubReward
 //    public static final String MAIN_ADUNIT = "8d2de5a1aa4a4b278a6c24ff4930a6e3";
 //    public static final String BACKFILL_ADUNIT = "20ac22127e13402d90662b77d2935467";
     //FAN
-    public static final String MAIN_ADUNIT = "0977449dba0b4713924850c19e064674";
-//    public static final String BACKFILL_ADUNIT = "9612a8755deb4af6b30ff3798b1858ae";
-public static final String BACKFILL_ADUNIT = "0977449dba0b4713924850c19e064674";
+public static final String MAIN_ADUNIT = "a8d5f5fff87c49b2a60c5df86ab4f447"; // SE test id
+
+//    public static final String MAIN_ADUNIT = "0977449dba0b4713924850c19e064674";
+    public static final String BACKFILL_ADUNIT = "9612a8755deb4af6b30ff3798b1858ae";
+//public static final String BACKFILL_ADUNIT = "0977449dba0b4713924850c19e064674";
 //    //Vungle
 //    public static final String MAIN_ADUNIT = "cb4f5c64766c41d792e4fa9bc2882ab4";
 //    public static final String BACKFILL_ADUNIT = "37630b6d51e64acd81f1afef2e93e7a6";
@@ -87,7 +95,7 @@ public static final String BACKFILL_ADUNIT = "0977449dba0b4713924850c19e064674";
 //    public static final String BACKFILL_ADUNIT = "ad51e6e6c65142aea2dd3e87397382fe";
 
 
-    public static final boolean TEST_RV_MULTIPLE = true;
+    public static final boolean TEST_RV_MULTIPLE = false;
     public static final int DEFAULT_RETRY_LIMIT = 20;
     public static final int DEFAULT_RETRY_DELAY_MS = 1000;
 
@@ -101,7 +109,7 @@ public static final String BACKFILL_ADUNIT = "0977449dba0b4713924850c19e064674";
 //    private static final List<String> sNetworksToInit = new LinkedList<>();
 
     @Nullable private Button mShowButton;
-    @Nullable Map<String, RewardedVideoStatus> mAdUnitIdsMap = new HashMap<>();
+    @Nullable HashMap<String, RewardedVideoStatus> mAdUnitIdsMap = new HashMap<>();
 
     private Handler handler;
     private static int sRetryCount = 0;
@@ -174,6 +182,7 @@ public static final String BACKFILL_ADUNIT = "0977449dba0b4713924850c19e064674";
     private void loadAd() {
         for (String id : mAdUnitIdsMap.keySet()) {
 //            if (mAdUnitIdsMap.get(id) == RewardedVideoStatus.EMPTY) {
+                Log.d  ("MoPub-Nick", "Find map ad unit ID: " + id);
                 MoPubRewardedVideos.loadRewardedVideo(id);
                 mAdUnitIdsMap.put(id, RewardedVideoStatus.LOADING);
 //                logToast(getActivity(), "Load ad: " + id);

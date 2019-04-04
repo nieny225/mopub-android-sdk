@@ -156,8 +156,9 @@ public class MultiAdResponse implements Iterator<AdResponse> {
             if (adResponseClear != null) {
                 refreshTimeMilliseconds = adResponseClear.getRefreshTimeMillis();
             }
+            //logging suggestion
             throw new MoPubNetworkError(
-                    "No ads found for ad unit.",
+                    "No ads found for ad unit. "+ adUnitId,
                     MoPubNetworkError.Reason.NO_FILL,
                     refreshTimeMilliseconds);
         }
@@ -207,8 +208,8 @@ public class MultiAdResponse implements Iterator<AdResponse> {
         Preconditions.checkNotNull(networkResponse);
         Preconditions.checkNotNull(jsonObject);
         Preconditions.checkNotNull(adFormat);
-
-        MoPubLog.log(RESPONSE_RECEIVED, jsonObject.toString());
+        //logging suggestion
+        MoPubLog.log(adUnitId, RESPONSE_RECEIVED, jsonObject.toString());
 
         final AdResponse.Builder builder = new AdResponse.Builder();
         final String content = jsonObject.optString(ResponseHeader.CONTENT.getKey());
