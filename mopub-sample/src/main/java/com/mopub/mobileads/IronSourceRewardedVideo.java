@@ -101,7 +101,7 @@ public class IronSourceRewardedVideo extends CustomEventRewardedVideo implements
 
     @Override
     protected boolean checkAndInitializeSdk(@NonNull Activity launcherActivity, @NonNull Map<String, Object> localExtras, @NonNull Map<String, String> serverExtras) throws Exception {
-
+        MoPubLog.log(LOAD_SUCCESS, ADAPTER_NAME);
         // Pass the user consent from the MoPub SDK to ironSource as per GDPR
         boolean canCollectPersonalInfo = MoPub.canCollectPersonalInformation();
         IronSource.setConsent(canCollectPersonalInfo);

@@ -327,6 +327,7 @@ public class MoPubLog {
 
     public enum AdapterLogEvent implements MPLogEventType {
 
+        INITILIZING(LogLevel.DEBUG, "Adapter {0} is initializing"),
         // Params:
         // Custom event name
         // Creative ID
