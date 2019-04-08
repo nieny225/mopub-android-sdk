@@ -84,9 +84,9 @@ public class FacebookRewardedVideo extends CustomEventRewardedVideo implements R
 
     @Override
     protected void loadWithSdkInitialized(@NonNull Activity activity, @NonNull Map<String, Object> localExtras, @NonNull Map<String, String> serverExtras) throws Exception {
+        AdSettings.addTestDevice("874f2ec5-e752-4aad-936b-fbbfbd2d033f");
         if (!serverExtras.isEmpty()) {
             mPlacementId = serverExtras.get("placement_id");
-            // AdSettings.addTestDevice("b4ee80ba-4691-40dc-b379-abad4caf9ff1");
             mFacebookAdapterConfiguration.setCachedInitializationParameters(activity.getApplicationContext(), serverExtras);
 
             if (!TextUtils.isEmpty(mPlacementId)) {
