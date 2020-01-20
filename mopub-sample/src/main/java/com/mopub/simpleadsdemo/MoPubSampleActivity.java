@@ -8,21 +8,34 @@ import android.annotation.TargetApi;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.design.widget.NavigationView;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.util.Log;
+
+// import android.support.annotation.NonNull;
+// import android.support.annotation.Nullable;
+// import android.support.design.widget.NavigationView;
+// import android.support.v4.app.ActivityCompat;
+// import android.support.v4.app.FragmentManager;
+// import android.support.v4.view.GravityCompat;
+// import android.support.v4.widget.DrawerLayout;
+// import android.support.v7.app.ActionBarDrawerToggle;
+// import android.support.v7.app.AppCompatActivity;
+// import android.support.v7.widget.Toolbar;
+// import android.util.Log;
+
 import android.view.Menu;
 import android.view.MenuItem;
 import android.webkit.WebView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.FragmentManager;
+
+import com.google.android.material.navigation.NavigationView;
 import com.mopub.common.Constants;
 import com.mopub.common.MoPub;
 import com.mopub.common.SdkConfiguration;
@@ -35,26 +48,33 @@ import com.mopub.common.privacy.ConsentStatusChangeListener;
 import com.mopub.common.privacy.PersonalInfoManager;
 import com.mopub.common.util.DeviceUtils;
 import com.mopub.common.util.Reflection;
+import com.mopub.mobileads.MoPubConversionTracker;
 import com.mopub.mobileads.MoPubErrorCode;
+import com.mopub.network.ImpressionData;
+import com.mopub.network.ImpressionListener;
+import com.mopub.network.ImpressionsEmitter;
+
+import org.json.JSONException;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.LinkedBlockingDeque;
 
 import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
-import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 import static com.mopub.common.Constants.UNUSED_REQUEST_CODE;
 import static com.mopub.common.logging.MoPubLog.LogLevel.DEBUG;
 import static com.mopub.common.logging.MoPubLog.LogLevel.INFO;
+import static com.mopub.common.logging.MoPubLog.SdkLogEvent.CUSTOM;
+import static com.mopub.common.logging.MoPubLog.SdkLogEvent.CUSTOM_WITH_THROWABLE;
 
 public class MoPubSampleActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     private static final List<String> REQUIRED_DANGEROUS_PERMISSIONS = new ArrayList<>();
+    private static final String SHOWING_CONSENT_DIALOG_KEY = "ShowingConsentDialog";
 
     static {
         REQUIRED_DANGEROUS_PERMISSIONS.add(ACCESS_COARSE_LOCATION);
-        REQUIRED_DANGEROUS_PERMISSIONS.add(WRITE_EXTERNAL_STORAGE);
     }
 
     // Sample app web views are debuggable.
@@ -71,13 +91,19 @@ public class MoPubSampleActivity extends AppCompatActivity
 
     private MoPubListFragment mMoPubListFragment;
     private Intent mDeeplinkIntent;
+    private boolean mShowingConsentDialog;
     @Nullable
     PersonalInfoManager mPersonalInfoManager;
 
-    @Nullable DrawerLayout mDrawerLayout;
+    @Nullable
+    DrawerLayout mDrawerLayout;
 
     @Nullable
     private ConsentStatusChangeListener mConsentStatusChangeListener;
+
+    @NonNull
+    private final LinkedBlockingDeque<String> mImpressionsList = new LinkedBlockingDeque<>();
+    private ImpressionListener mImpressionListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,6 +112,7 @@ public class MoPubSampleActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setTitle(getString(R.string.app_title));
 
         setupNavigationDrawer(toolbar);
 
@@ -108,14 +135,20 @@ public class MoPubSampleActivity extends AppCompatActivity
 
         if (savedInstanceState == null) {
             createMoPubListFragment(getIntent());
+        } else {
+            mShowingConsentDialog = savedInstanceState.getBoolean(SHOWING_CONSENT_DIALOG_KEY);
         }
 
-        final SdkConfiguration.Builder configBuilder = new SdkConfiguration.Builder("b195f8dd8ded45fe847ad89ed1d016da");
+        final SdkConfiguration.Builder configBuilder = new SdkConfiguration.Builder(
+                "b195f8dd8ded45fe847ad89ed1d016da");
         if (BuildConfig.DEBUG) {
             configBuilder.withLogLevel(DEBUG);
         } else {
             configBuilder.withLogLevel(INFO);
         }
+
+        SampleActivityUtils.addDefaultNetworkConfiguration(configBuilder);
+
         MoPub.initializeSdk(this, configBuilder.build(), initSdkListener());
 
         mConsentStatusChangeListener = initConsentChangeListener();
@@ -127,6 +160,10 @@ public class MoPubSampleActivity extends AppCompatActivity
         // Intercepts all logs including Level.FINEST so we can show a toast
         // that is not normally user-facing. This is only used for native ads.
         LoggingUtils.enableCanaryLogging(this);
+
+
+        mImpressionListener = createImpressionsListener();
+        ImpressionsEmitter.addListener(mImpressionListener);
     }
 
     @Override
@@ -136,6 +173,8 @@ public class MoPubSampleActivity extends AppCompatActivity
             mPersonalInfoManager.unsubscribeConsentStatusChangeListener(mConsentStatusChangeListener);
         }
         mConsentStatusChangeListener = null;
+
+        ImpressionsEmitter.removeListener(mImpressionListener);
         super.onDestroy();
     }
 
@@ -176,6 +215,7 @@ public class MoPubSampleActivity extends AppCompatActivity
                 if (mPersonalInfoManager != null && mPersonalInfoManager.shouldShowConsentDialog()) {
                     mPersonalInfoManager.loadConsentDialog(initDialogLoadListener());
                 }
+                new MoPubConversionTracker(MoPubSampleActivity.this).reportAppOpen();
             }
         };
     }
@@ -202,6 +242,7 @@ public class MoPubSampleActivity extends AppCompatActivity
             public void onConsentDialogLoaded() {
                 if (mPersonalInfoManager != null) {
                     mPersonalInfoManager.showConsentDialog();
+                    mShowingConsentDialog = true;
                 }
             }
 
@@ -229,6 +270,7 @@ public class MoPubSampleActivity extends AppCompatActivity
     private static final String PRIVACY_FRAGMENT_TAG = "privacy_info_fragment";
     private static final String NETWORKS_FRAGMENT_TAG = "networks_info_fragment";
     private static final String LIST_FRAGMENT_TAG = "list_fragment";
+    private static final String IMPRESSIONS_FRAGMENT_TAG = "impressions_info_fragment";
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -272,6 +314,20 @@ public class MoPubSampleActivity extends AppCompatActivity
     }
 
     @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_impressions:
+                onImpressionsMenu();
+                return true;
+            case R.id.action_clear_logs:
+                onClearLogs();
+                return true;
+            default:
+                return super.onContextItemSelected(item);
+        }
+    }
+
+    @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
         switch (menuItem.getItemId()) {
             case R.id.nav_production:
@@ -306,6 +362,32 @@ public class MoPubSampleActivity extends AppCompatActivity
         return false;
     }
 
+    @Override
+    public void onSaveInstanceState(@NonNull final Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+        savedInstanceState.putBoolean(SHOWING_CONSENT_DIALOG_KEY, mShowingConsentDialog);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (mShowingConsentDialog) {
+            mShowingConsentDialog = false;
+            Utils.logToast(MoPubSampleActivity.this, "Consent dialog dismissed");
+        }
+    }
+
+    private void onImpressionsMenu() {
+        final FragmentManager manager = getSupportFragmentManager();
+        if (manager.findFragmentByTag(IMPRESSIONS_FRAGMENT_TAG) == null) {
+            ImpressionsInfoFragment fragment = ImpressionsInfoFragment.newInstance(new ArrayList<>(mImpressionsList));
+            manager.beginTransaction()
+                    .replace(R.id.fragment_container, fragment, IMPRESSIONS_FRAGMENT_TAG)
+                    .addToBackStack(IMPRESSIONS_FRAGMENT_TAG)
+                    .commit();
+        }
+    }
+
     private void onNavEnvironemnt(boolean production) {
         setEndpoint(production ? PROD_HOST : TEST_HOST);
     }
@@ -324,7 +406,7 @@ public class MoPubSampleActivity extends AppCompatActivity
         final FragmentManager manager = getSupportFragmentManager();
         final MoPubListFragment listFragment = (MoPubListFragment) manager.findFragmentByTag(LIST_FRAGMENT_TAG);
         if (listFragment == null) {
-            MoPubLog.log(MoPubLog.SdkLogEvent.CUSTOM, getString(R.string.list_fragment_not_found));
+            MoPubLog.log(CUSTOM, getString(R.string.list_fragment_not_found));
             return; // fragment is not ready to update the consent
         }
         if (!listFragment.onChangeConsent(grant)) {
@@ -358,7 +440,35 @@ public class MoPubSampleActivity extends AppCompatActivity
             Field field = Reflection.getPrivateField(com.mopub.common.Constants.class, "HOST");
             field.set(null, host);
         } catch (Exception e) {
-            MoPubLog.log(MoPubLog.SdkLogEvent.CUSTOM_WITH_THROWABLE, "Can't change HOST.", e);
+            MoPubLog.log(CUSTOM_WITH_THROWABLE, "Can't change HOST.", e);
         }
+    }
+
+    private void onClearLogs() {
+        FragmentManager manager = getSupportFragmentManager();
+        final ImpressionsInfoFragment fragment = (ImpressionsInfoFragment) manager.findFragmentByTag(IMPRESSIONS_FRAGMENT_TAG);
+        if (fragment != null) {
+            fragment.onClear();
+        }
+        mImpressionsList.clear();
+    }
+
+    private ImpressionListener createImpressionsListener() {
+        return new ImpressionListener() {
+            @Override
+            public void onImpression(@NonNull final String adUnitId, @Nullable final ImpressionData impressionData) {
+                MoPubLog.log(CUSTOM, "impression for adUnitId= " + adUnitId);
+
+                if (impressionData == null) {
+                    mImpressionsList.addFirst("adUnitId= " + adUnitId + "\ndata= null");
+                } else {
+                    try {
+                        mImpressionsList.addFirst(impressionData.getJsonRepresentation().toString(2));
+                    } catch (JSONException e) {
+                        MoPubLog.log(CUSTOM_WITH_THROWABLE, "Can't format impression data.", e);
+                    }
+                }
+            }
+        };
     }
 }

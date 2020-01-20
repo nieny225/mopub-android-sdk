@@ -4,8 +4,8 @@
 
 package com.mopub.mobileads;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.mopub.common.Preconditions;
@@ -147,7 +147,9 @@ class VastCompanionAdXmlManager {
 
         for (final Node trackerNode : trackerNodes) {
             final String trackerUrl = XmlUtils.getNodeValue(trackerNode);
-            companionCreativeViewTrackers.add(new VastTracker(trackerUrl));
+            if (trackerUrl != null) {
+                companionCreativeViewTrackers.add(new VastTracker(trackerUrl));
+            }
         }
 
         return companionCreativeViewTrackers;

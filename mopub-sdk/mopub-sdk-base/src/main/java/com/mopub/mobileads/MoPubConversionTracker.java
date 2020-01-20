@@ -6,7 +6,7 @@ package com.mopub.mobileads;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.mopub.common.Constants;
 import com.mopub.common.MoPub;
@@ -54,7 +54,7 @@ public class MoPubConversionTracker {
      *
      * @param sessionTracker - true for session tracking
      */
-    public void reportAppOpen(boolean sessionTracker) {
+    public void reportAppOpen(final boolean sessionTracker) {
         final PersonalInfoManager infoManager = MoPub.getPersonalInformationManager();
         if (infoManager == null) {
             MoPubLog.log(CUSTOM, "Cannot report app open until initialization is done");
@@ -89,6 +89,9 @@ public class MoPubConversionTracker {
                 mContext, new TrackingRequest.Listener() {
                     @Override
                     public void onResponse(@NonNull final String url) {
+                        if (sessionTracker) {
+                            return;
+                        }
                         mSharedPreferences
                                 .edit()
                                 .putBoolean(mIsTrackedKey, true)

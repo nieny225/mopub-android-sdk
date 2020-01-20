@@ -10,8 +10,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.mopub.common.Constants;
@@ -68,7 +68,6 @@ public class VastVideoConfig implements Serializable {
     @Nullable private String mCustomCtaText;
     @Nullable private String mCustomSkipText;
     @Nullable private String mCustomCloseIconUrl;
-    @NonNull private DeviceUtils.ForceOrientation mCustomForceOrientation = DeviceUtils.ForceOrientation.FORCE_LANDSCAPE; // Default is forcing landscape
     @Nullable private VideoViewabilityTracker mVideoViewabilityTracker;
     // Viewability
     @NonNull private final Map<String, String> mExternalViewabilityTrackers;
@@ -79,13 +78,6 @@ public class VastVideoConfig implements Serializable {
     private String mDspCreativeId;
     private String mPrivacyInformationIconImageUrl;
     private String mPrivacyInformationIconClickthroughUrl;
-
-    /**
-     * Flag to indicate if the VAST xml document has explicitly set the orientation as opposed to
-     * using the default.
-     */
-    private boolean mIsForceOrientationSet;
-
 
     public VastVideoConfig() {
         mImpressionTrackers = new ArrayList<VastTracker>();
@@ -323,13 +315,6 @@ public class VastVideoConfig implements Serializable {
         }
     }
 
-    public void setCustomForceOrientation(@Nullable final DeviceUtils.ForceOrientation customForceOrientation) {
-        if (customForceOrientation != null && customForceOrientation != DeviceUtils.ForceOrientation.UNDEFINED) {
-            mCustomForceOrientation = customForceOrientation;
-            mIsForceOrientationSet = true;
-        }
-    }
-
     public void setSkipOffset(@Nullable final String skipOffset) {
         if (skipOffset != null) {
             mSkipOffset = skipOffset;
@@ -487,10 +472,6 @@ public class VastVideoConfig implements Serializable {
         return mMoatImpressionPixels;
     }
 
-    public boolean isCustomForceOrientationSet() {
-        return mIsForceOrientationSet;
-    }
-
     /**
      * Returns whether or not there is a companion ad set. There must be both a landscape and a
      * portrait companion ad set for this to be true.
@@ -499,15 +480,6 @@ public class VastVideoConfig implements Serializable {
      */
     public boolean hasCompanionAd() {
         return mLandscapeVastCompanionAdConfig != null && mPortraitVastCompanionAdConfig != null;
-    }
-
-    /**
-     * Get custom force orientation
-     * @return ForceOrientation enum (default is FORCE_LANDSCAPE)
-     */
-    @NonNull
-    public DeviceUtils.ForceOrientation getCustomForceOrientation() {
-        return mCustomForceOrientation;
     }
 
     /**
@@ -695,7 +667,7 @@ public class VastVideoConfig implements Serializable {
     }
 
     /**
-     * Called when the video is closed or skipped.
+     * Called when the video is closed.
      *
      * @param context         The context. Can be application or activity context.
      * @param contentPlayHead Current video playback time.
@@ -709,7 +681,16 @@ public class VastVideoConfig implements Serializable {
                 mNetworkMediaFileUrl,
                 context
         );
+    }
 
+    /**
+     * Called when the video is skipped.
+     *
+     * @param context         The context. Can be application or activity context.
+     * @param contentPlayHead Current video playback time.
+     */
+    public void handleSkip(@NonNull Context context, int contentPlayHead) {
+        Preconditions.checkNotNull(context, "context cannot be null");
         makeVastTrackingHttpRequest(
                 mSkipTrackers,
                 null,

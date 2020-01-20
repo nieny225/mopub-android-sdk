@@ -12,7 +12,7 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.view.Gravity;
 import android.widget.Toast;
 
@@ -267,9 +267,12 @@ public class ManifestUtils {
         if (isDebuggable(context)) {
             final String message = "ERROR: YOUR MOPUB INTEGRATION IS INCOMPLETE.\n" +
                     "Check logcat and update your AndroidManifest.xml with the correct activities and configuration.";
-            final Toast toast = Toast.makeText(context, message, Toast.LENGTH_LONG);
-            toast.setGravity(Gravity.FILL_HORIZONTAL, 0, 0);
-            toast.show();
+            final Context applicationContext = context.getApplicationContext();
+            if (applicationContext != null) {
+                final Toast toast = Toast.makeText(applicationContext, message, Toast.LENGTH_LONG);
+                toast.setGravity(Gravity.FILL_HORIZONTAL, 0, 0);
+                toast.show();
+            }
         }
     }
 

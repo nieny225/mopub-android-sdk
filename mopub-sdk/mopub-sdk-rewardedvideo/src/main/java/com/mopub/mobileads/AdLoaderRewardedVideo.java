@@ -5,13 +5,14 @@
 package com.mopub.mobileads;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.mopub.common.AdFormat;
 import com.mopub.common.Preconditions;
 import com.mopub.network.AdLoader;
 import com.mopub.network.AdResponse;
+import com.mopub.network.SingleImpression;
 import com.mopub.network.TrackingRequest;
 
 import java.util.Collections;
@@ -72,6 +73,9 @@ class AdLoaderRewardedVideo extends AdLoader {
         TrackingRequest.makeTrackingHttpRequest(
                 getImpressionUrls(),
                 context);
+
+        final String adUnitId = mLastDeliveredResponse.getAdUnitId();
+        new SingleImpression(adUnitId, mLastDeliveredResponse.getImpressionData()).sendImpression();
     }
 
     void trackClick(@NonNull Context context) {

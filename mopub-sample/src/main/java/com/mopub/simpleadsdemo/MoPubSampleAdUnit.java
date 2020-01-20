@@ -5,33 +5,31 @@
 package com.mopub.simpleadsdemo;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 
 import java.util.Comparator;
 import java.util.Locale;
 
 class MoPubSampleAdUnit implements Comparable<MoPubSampleAdUnit> {
 
-    public static final String AD_UNIT_ID = "adUnitId";
-    public static final String DESCRIPTION = "description";
-    public static final String AD_TYPE = "adType";
-    public static final String IS_USER_DEFINED = "isCustom";
-    public static final String ID = "id";
+    private static final String AD_UNIT_ID = "adUnitId";
+    static final String DESCRIPTION = "description";
+    private static final String AD_TYPE = "adType";
+    private static final String IS_USER_DEFINED = "isCustom";
+    private static final String ID = "id";
 
     // Note that entries are also sorted in this order
     enum AdType {
         BANNER("Banner", BannerDetailFragment.class),
-        MRECT("Mrect", MrectDetailFragment.class),
-        LEADERBOARD("Leaderboard", LeaderboardDetailFragment.class),
-        SKYSCRAPER("Skyscraper", SkyscraperDetailFragment.class),
+        MEDIUM_RECTANGLE("Medium Rectangle", MediumRectangleDetailFragment.class),
         INTERSTITIAL("Interstitial", InterstitialDetailFragment.class),
         REWARDED_VIDEO("Rewarded Video", RewardedVideoDetailFragment.class),
         LIST_VIEW("Native List View", NativeListViewFragment.class),
         RECYCLER_VIEW("Native Recycler View", NativeRecyclerViewFragment.class),
         CUSTOM_NATIVE("Native Gallery (Custom Stream)", NativeGalleryFragment.class),
-        MANUAL_NATIVE("Native (Manual)", NativeDetailFragment.class);
+        MANUAL_NATIVE("Native Manual", NativeManualFragment.class);
 
         String getName() {
             return name;
@@ -69,12 +67,8 @@ class MoPubSampleAdUnit implements Comparable<MoPubSampleAdUnit> {
                     return BANNER;
                 case "interstitial":
                     return INTERSTITIAL;
-                case "mrect":
-                    return MRECT;
-                case "leaderboard":
-                    return LEADERBOARD;
-                case "skyscraper":
-                    return SKYSCRAPER;
+                case "mediumrectangle":
+                    return MEDIUM_RECTANGLE;
                 case "rewarded":
                     return REWARDED_VIDEO;
                 case "native":
@@ -95,7 +89,11 @@ class MoPubSampleAdUnit implements Comparable<MoPubSampleAdUnit> {
             new Comparator<MoPubSampleAdUnit>() {
                 @Override
                 public int compare(MoPubSampleAdUnit a, MoPubSampleAdUnit b) {
-                    return a.compareTo(b);
+                    if (a.mAdType != b.mAdType) {
+                        return a.mAdType.ordinal() - b.mAdType.ordinal();
+                    }
+
+                    return a.mDescription.compareTo(b.mDescription);
                 }
             };
 
@@ -187,7 +185,7 @@ class MoPubSampleAdUnit implements Comparable<MoPubSampleAdUnit> {
     }
 
     static MoPubSampleAdUnit fromBundle(final Bundle bundle) {
-        final Long id = bundle.getLong(ID, -1L);
+        final long id = bundle.getLong(ID, -1L);
         final String adUnitId = bundle.getString(AD_UNIT_ID);
         final AdType adType = (AdType) bundle.getSerializable(AD_TYPE);
         final String description = bundle.getString(DESCRIPTION);
@@ -206,7 +204,7 @@ class MoPubSampleAdUnit implements Comparable<MoPubSampleAdUnit> {
             return mAdType.ordinal() - that.mAdType.ordinal();
         }
 
-        return mDescription.compareTo(that.mDescription);
+        return mAdUnitId.compareTo(that.mAdUnitId);
     }
 
     @Override
@@ -239,5 +237,11 @@ class MoPubSampleAdUnit implements Comparable<MoPubSampleAdUnit> {
                 that.mIsUserDefined == this.mIsUserDefined &&
                 that.mDescription.equals(this.mDescription) &&
                 that.mAdUnitId.equals(this.mAdUnitId);
+    }
+
+    @Override
+    @NonNull
+    public String toString() {
+        return mDescription == null ? "" : mDescription;
     }
 }

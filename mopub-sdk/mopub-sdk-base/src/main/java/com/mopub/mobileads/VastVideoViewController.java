@@ -14,8 +14,8 @@ import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.MotionEvent;
@@ -262,21 +262,6 @@ public class VastVideoViewController extends BaseVideoViewController {
     protected void onCreate() {
         super.onCreate();
 
-        switch (mVastVideoConfig.getCustomForceOrientation()) {
-            case FORCE_PORTRAIT:
-                getBaseVideoViewControllerListener().onSetRequestedOrientation(SCREEN_ORIENTATION_PORTRAIT);
-                break;
-            case FORCE_LANDSCAPE:
-                getBaseVideoViewControllerListener().onSetRequestedOrientation(SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
-                break;
-            case DEVICE_ORIENTATION:
-                break;  // don't do anything
-            case UNDEFINED:
-                break;  // don't do anything
-            default:
-                break;
-        }
-
         mVastVideoConfig.handleImpression(getContext(), getCurrentPosition());
         broadcastAction(IntentActions.ACTION_INTERSTITIAL_SHOW);
     }
@@ -348,9 +333,7 @@ public class VastVideoViewController extends BaseVideoViewController {
 
     @Override
     protected void onBackPressed() {
-        if (!mIsVideoFinishedPlaying) {
-            mExternalViewabilitySessionManager.recordVideoEvent(VideoEvent.AD_SKIPPED, getCurrentPosition());
-        }
+        handleExitTrackers();
     }
 
     // Enable the device's back button when the video close button has been displayed
@@ -364,6 +347,24 @@ public class VastVideoViewController extends BaseVideoViewController {
         if (requestCode == MOPUB_BROWSER_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             getBaseVideoViewControllerListener().onFinish();
         }
+    }
+
+    private void handleExitTrackers() {
+        final int currentPosition = getCurrentPosition();
+        // if mIsVideoFinishedPlaying, then the appropriate trackers have already been fired
+        // a bug in the android.widget.VideoView cause onCompletion to sometimes not be called
+        if (!mIsVideoFinishedPlaying) {
+            // if our current position is less than the duration, we assume this is a skip
+            if (currentPosition < mDuration) {
+                mExternalViewabilitySessionManager.recordVideoEvent(VideoEvent.AD_SKIPPED, currentPosition);
+                mVastVideoConfig.handleSkip(getContext(), currentPosition);
+            } else {
+                mExternalViewabilitySessionManager.recordVideoEvent(VideoEvent.AD_COMPLETE, currentPosition);
+                mVastVideoConfig.handleComplete(getContext(), mDuration);
+            }
+        }
+
+        mVastVideoConfig.handleClose(getContext(), mDuration);
     }
 
     private void adjustSkipOffset() {
@@ -498,7 +499,6 @@ public class VastVideoViewController extends BaseVideoViewController {
 
         mTopGradientStripWidget = new VastVideoGradientStripWidget(context,
                 GradientDrawable.Orientation.TOP_BOTTOM,
-                mVastVideoConfig.getCustomForceOrientation(),
                 hasCompanionAd,
                 View.VISIBLE,
                 RelativeLayout.ALIGN_TOP,
@@ -512,7 +512,6 @@ public class VastVideoViewController extends BaseVideoViewController {
 
         mBottomGradientStripWidget = new VastVideoGradientStripWidget(context,
                 GradientDrawable.Orientation.BOTTOM_TOP,
-                mVastVideoConfig.getCustomForceOrientation(),
                 hasCompanionAd,
                 View.GONE,
                 RelativeLayout.ABOVE,
@@ -566,20 +565,14 @@ public class VastVideoViewController extends BaseVideoViewController {
         final View.OnTouchListener closeOnTouchListener = new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
-                final int currentPosition;
-                if (mIsVideoFinishedPlaying) {
-                    currentPosition = mDuration;
-                } else {
-                    currentPosition = getCurrentPosition();
+                // consume and do nothing for MotionEvents other than ACTION_UP
+                if (motionEvent.getAction() != MotionEvent.ACTION_UP) {
+                    return true;
                 }
-                if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
-                    mIsClosing = true;
-                    if (!mIsVideoFinishedPlaying) {
-                        mExternalViewabilitySessionManager.recordVideoEvent(VideoEvent.AD_SKIPPED, getCurrentPosition());
-                    }
-                    mVastVideoConfig.handleClose(getContext(), currentPosition);
-                    getBaseVideoViewControllerListener().onFinish();
-                }
+
+                mIsClosing = true;
+                handleExitTrackers();
+                getBaseVideoViewControllerListener().onFinish();
                 return true;
             }
         };

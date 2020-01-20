@@ -4,8 +4,8 @@
 
 package com.mopub.mobileads;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.mopub.common.AdFormat;
 import com.mopub.common.AdType;
@@ -23,10 +23,6 @@ public class AdTypeTranslator {
                 "com.mopub.mobileads.GooglePlayServicesBanner", false),
         GOOGLE_PLAY_SERVICES_INTERSTITIAL("admob_full_interstitial",
                 "com.mopub.mobileads.GooglePlayServicesInterstitial", false),
-        MILLENNIAL_BANNER("millennial_native_banner",
-                "com.mopub.mobileads.MillennialBanner", false),
-        MILLENNIAL_INTERSTITIAL("millennial_full_interstitial",
-                "com.mopub.mobileads.MillennialInterstitial", false),
 
         // MoPub-specific custom events.
         MRAID_BANNER("mraid_banner",

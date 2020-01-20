@@ -9,13 +9,16 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.app.ListFragment;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.fragment.app.ListFragment;
+
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -53,15 +56,19 @@ public class MoPubListFragment extends ListFragment implements TrashCanClickList
 
     private MoPubSampleListAdapter mAdapter;
     private AdUnitDataSource mAdUnitDataSource;
+    private EditText mSearchBar;
+    private Button mSearchBarClearButton;
 
     private static final AdType[] adTypes = AdType.values();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        initializeAdapter();
 
-        MoPub.setBrowserAgent(MoPub.BrowserAgent.NATIVE);
+        // initializeAdapter();
+
+        // MoPub.setBrowserAgent(MoPub.BrowserAgent.NATIVE);
+
     }
 
     void addAdUnitViaDeeplink(@Nullable final Uri deeplinkData) {
@@ -103,6 +110,36 @@ public class MoPubListFragment extends ListFragment implements TrashCanClickList
             @Override
             public void onClick(final View view) {
                 onAddClicked(view);
+            }
+        });
+
+        mSearchBar = view.findViewById(R.id.search_bar_et);
+        mSearchBarClearButton = view.findViewById(R.id.search_bar_clear_button);
+
+        mSearchBarClearButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mSearchBar != null) {
+                    mSearchBar.getText().clear();
+                }
+            }
+        });
+
+        mSearchBar.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(final Editable text) {
+                final MoPubSampleListAdapter adapter = mAdapter;
+                if (adapter != null && text != null) {
+                    adapter.getFilter().filter(text.toString());
+                }
             }
         });
 
@@ -175,22 +212,26 @@ public class MoPubListFragment extends ListFragment implements TrashCanClickList
     @Override
     public void onResume() {
         super.onResume();
+        syncDbAdapter();
         Utils.hideSoftKeyboard(getListView());
     }
 
-    private void initializeAdapter() {
-        mAdapter = new MoPubSampleListAdapter(getActivity(), this);
+    private void syncDbAdapter() {
+        if (mAdapter == null) {
+            mAdapter = new MoPubSampleListAdapter(getActivity(), this);
 
-        mAdUnitDataSource = new AdUnitDataSource(getActivity());
+            mAdUnitDataSource = new AdUnitDataSource(getActivity());
 
-        // If you have a large amount of data, this loading work should be done in the background.
-        final List<MoPubSampleAdUnit> adUnits = mAdUnitDataSource.getAllAdUnits();
-        for (final MoPubSampleAdUnit adUnit : adUnits) {
-            mAdapter.add(adUnit);
+            // If you have a large amount of data, this loading work should be done in the background.
+            mAdapter.addAll(mAdUnitDataSource.getAllAdUnits());
+
+            setListAdapter(mAdapter);
         }
 
+        if (mSearchBar != null) {
+            mAdapter.getFilter().filter(mSearchBar.getText().toString());
+        }
         mAdapter.sort(MoPubSampleAdUnit.COMPARATOR);
-        setListAdapter(mAdapter);
     }
 
     @Override
@@ -218,14 +259,14 @@ public class MoPubListFragment extends ListFragment implements TrashCanClickList
             }
         }
         mAdapter.add(createdAdUnit);
-        mAdapter.sort(MoPubSampleAdUnit.COMPARATOR);
+        syncDbAdapter();
         return createdAdUnit;
     }
 
     void deleteAdUnit(final MoPubSampleAdUnit moPubSampleAdUnit) {
         mAdUnitDataSource.deleteSampleAdUnit(moPubSampleAdUnit);
         mAdapter.remove(moPubSampleAdUnit);
-        mAdapter.sort(MoPubSampleAdUnit.COMPARATOR);
+        syncDbAdapter();
     }
 
     /**

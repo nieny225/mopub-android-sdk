@@ -17,6 +17,7 @@ import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import android.view.View;
 import android.webkit.WebView;
 import android.widget.ImageView;
@@ -25,7 +26,6 @@ import android.widget.VideoView;
 import com.mopub.common.ExternalViewabilitySession;
 import com.mopub.common.MoPubBrowser;
 import com.mopub.common.test.support.SdkTestRunner;
-import com.mopub.common.util.DeviceUtils.ForceOrientation;
 import com.mopub.mobileads.resource.CloseButtonDrawable;
 import com.mopub.mobileads.test.support.GestureUtils;
 import com.mopub.mobileads.test.support.ShadowVastVideoView;
@@ -52,7 +52,6 @@ import org.robolectric.shadows.ShadowView;
 import org.robolectric.shadows.httpclient.FakeHttp;
 import org.robolectric.shadows.httpclient.RequestMatcher;
 import org.robolectric.shadows.httpclient.TestHttpResponse;
-import org.robolectric.shadows.support.v4.ShadowLocalBroadcastManager;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -60,8 +59,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import static android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
-import static android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE;
 import static com.mopub.common.IntentActions.ACTION_INTERSTITIAL_DISMISS;
 import static com.mopub.common.IntentActions.ACTION_INTERSTITIAL_FAIL;
 import static com.mopub.common.IntentActions.ACTION_INTERSTITIAL_SHOW;
@@ -234,7 +231,7 @@ public class VastVideoViewControllerTest {
             }
         }, new TestHttpResponse(200, "body"));
 
-        ShadowLocalBroadcastManager.getInstance(context).registerReceiver(broadcastReceiver,
+        LocalBroadcastManager.getInstance(context).registerReceiver(broadcastReceiver,
                 new EventForwardingBroadcastReceiver(null,
                 testBroadcastIdentifier).getIntentFilter());
 
@@ -246,7 +243,7 @@ public class VastVideoViewControllerTest {
         Robolectric.getForegroundThreadScheduler().reset();
         Robolectric.getBackgroundThreadScheduler().reset();
 
-        ShadowLocalBroadcastManager.getInstance(context).unregisterReceiver(broadcastReceiver);
+        LocalBroadcastManager.getInstance(context).unregisterReceiver(broadcastReceiver);
     }
 
     @Test
@@ -557,60 +554,6 @@ public class VastVideoViewControllerTest {
         subject.onCreate();
         verify(broadcastReceiver).onReceive(any(Context.class),
                 argThat(new IntentIsEqual(expectedIntent)));
-    }
-
-    @Test
-    public void onCreate_whenCustomForceOrientationNotSpecified_shouldForceLandscapeOrientation() throws Exception {
-        VastVideoConfig vastVideoConfig = new VastVideoConfig();
-        vastVideoConfig.setDiskMediaFileUrl("disk_video_path");
-        bundle.putSerializable(VAST_VIDEO_CONFIG, vastVideoConfig);
-
-        initializeSubject();
-        subject.onCreate();
-
-        verify(baseVideoViewControllerListener).onSetRequestedOrientation(
-                SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
-    }
-
-    @Test
-    public void onCreate_whenCustomForceOrientationIsDeviceOrientation_shouldNotForceLandscapeOrientation() throws Exception {
-        VastVideoConfig vastVideoConfig = new VastVideoConfig();
-        vastVideoConfig.setDiskMediaFileUrl("disk_video_path");
-        vastVideoConfig.setCustomForceOrientation(ForceOrientation.DEVICE_ORIENTATION);
-        bundle.putSerializable(VAST_VIDEO_CONFIG, vastVideoConfig);
-
-        initializeSubject();
-        subject.onCreate();
-
-        verify(baseVideoViewControllerListener, never()).onSetRequestedOrientation(anyInt());
-    }
-
-    @Test
-    public void onCreate_whenCustomForceOrientationIsPortraitOrientation_shouldForcePortraitOrientation() throws Exception {
-        VastVideoConfig vastVideoConfig = new VastVideoConfig();
-        vastVideoConfig.setDiskMediaFileUrl("disk_video_path");
-        vastVideoConfig.setCustomForceOrientation(ForceOrientation.FORCE_PORTRAIT);
-        bundle.putSerializable(VAST_VIDEO_CONFIG, vastVideoConfig);
-
-        initializeSubject();
-        subject.onCreate();
-
-        verify(baseVideoViewControllerListener).onSetRequestedOrientation(
-                SCREEN_ORIENTATION_PORTRAIT);
-    }
-
-    @Test
-    public void onCreate_whenCustomForceOrientationIsLandscapeOrientation_shouldForceLandscapeOrientation() throws Exception {
-        VastVideoConfig vastVideoConfig = new VastVideoConfig();
-        vastVideoConfig.setDiskMediaFileUrl("disk_video_path");
-        vastVideoConfig.setCustomForceOrientation(ForceOrientation.FORCE_LANDSCAPE);
-        bundle.putSerializable(VAST_VIDEO_CONFIG, vastVideoConfig);
-
-        initializeSubject();
-        subject.onCreate();
-
-        verify(baseVideoViewControllerListener).onSetRequestedOrientation(
-                SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
     }
 
     @Test
@@ -2096,12 +2039,10 @@ public class VastVideoViewControllerTest {
 
         verify(mockRequestQueue).add(
                 argThat(isUrl("close?errorcode=&asseturi=video_url&contentplayhead=00:00:15.094")));
-        verify(mockRequestQueue).add(
-                argThat(isUrl("skip?errorcode=&asseturi=video_url&contentplayhead=00:00:15.094")));
     }
 
     @Test
-    public void onClickCloseButtonTextView_whenCloseButtonIsVisible_shouldFireCloseTrackers() throws Exception {
+    public void onClickCloseButtonTextView_whenCloseButtonIsVisible_whenGteDuration_shouldFireCloseTrackers() throws Exception {
         initializeSubject();
         spyOnVideoView();
         // Because it's almost never exactly 15 seconds
@@ -2119,8 +2060,77 @@ public class VastVideoViewControllerTest {
 
         verify(mockRequestQueue).add(
                 argThat(isUrl("close?errorcode=&asseturi=video_url&contentplayhead=00:00:15.203")));
+    }
+
+    @Test
+    public void onClickCloseButtonTextView_whenCloseButtonIsVisible_whenLessThanDuration_shouldFireCloseTrackers_shouldFireSkipTrackers() throws Exception {
+        initializeSubject();
+        spyOnVideoView();
+        // Because it's almost never exactly 15 seconds
+        when(spyVideoView.getDuration()).thenReturn(15000);
+        when(spyVideoView.getCurrentPosition()).thenReturn(14999);
+        getShadowVideoView().getOnPreparedListener().onPrepared(null);
+
+        subject.setCloseButtonVisible(true);
+
+        // We don't have direct access to the CloseButtonWidget text's close event, so we manually
+        // invoke its onTouchListener's onTouch callback with a fake MotionEvent.ACTION_UP action.
+        View.OnTouchListener closeButtonTextViewOnTouchListener =
+                shadowOf(subject.getCloseButtonWidget().getTextView()).getOnTouchListener();
+        closeButtonTextViewOnTouchListener.onTouch(null, GestureUtils.createActionUp(0, 0));
+
         verify(mockRequestQueue).add(
-                argThat(isUrl("skip?errorcode=&asseturi=video_url&contentplayhead=00:00:15.203")));
+                argThat(isUrl("skip?errorcode=&asseturi=video_url&contentplayhead=00:00:14.999")));
+        verify(mockRequestQueue).add(
+                argThat(isUrl("close?errorcode=&asseturi=video_url&contentplayhead=00:00:15.000")));
+    }
+
+    @Test
+    public void onClickCloseButtonTextView_whenCompletionNotFired_whenCloseButtonIsVisible_whenGreaterThanDuration_shouldFireCloseTrackers_shouldFireCompleteTrackers_shouldNotFireSkipTrackers() throws Exception {
+        initializeSubject();
+        spyOnVideoView();
+        // Because it's almost never exactly 15 seconds
+        when(spyVideoView.getDuration()).thenReturn(15000);
+        when(spyVideoView.getCurrentPosition()).thenReturn(15001);
+        getShadowVideoView().getOnPreparedListener().onPrepared(null);
+
+        subject.setCloseButtonVisible(true);
+
+        // We don't have direct access to the CloseButtonWidget text's close event, so we manually
+        // invoke its onTouchListener's onTouch callback with a fake MotionEvent.ACTION_UP action.
+        View.OnTouchListener closeButtonTextViewOnTouchListener =
+                shadowOf(subject.getCloseButtonWidget().getTextView()).getOnTouchListener();
+        closeButtonTextViewOnTouchListener.onTouch(null, GestureUtils.createActionUp(0, 0));
+
+        verify(mockRequestQueue).add(argThat(isUrl(
+                "complete?errorcode=&asseturi=video_url&contentplayhead=00:00:15.000")));
+        verify(mockRequestQueue).add(
+                argThat(isUrl("close?errorcode=&asseturi=video_url&contentplayhead=00:00:15.000")));
+        verifyNoMoreInteractions(mockRequestQueue);
+    }
+
+    @Test
+    public void onClickCloseButtonTextView_whenCompletionNotFired_whenCloseButtonIsVisible_whenEqualToDuration_shouldFireCloseTrackers_shouldFireCompleteTrackers_shouldNotFireSkipTrackers() throws Exception {
+        initializeSubject();
+        spyOnVideoView();
+        // Because it's almost never exactly 15 seconds
+        when(spyVideoView.getDuration()).thenReturn(15000);
+        when(spyVideoView.getCurrentPosition()).thenReturn(15000);
+        getShadowVideoView().getOnPreparedListener().onPrepared(null);
+
+        subject.setCloseButtonVisible(true);
+
+        // We don't have direct access to the CloseButtonWidget text's close event, so we manually
+        // invoke its onTouchListener's onTouch callback with a fake MotionEvent.ACTION_UP action.
+        View.OnTouchListener closeButtonTextViewOnTouchListener =
+                shadowOf(subject.getCloseButtonWidget().getTextView()).getOnTouchListener();
+        closeButtonTextViewOnTouchListener.onTouch(null, GestureUtils.createActionUp(0, 0));
+
+        verify(mockRequestQueue).add(argThat(isUrl(
+                "complete?errorcode=&asseturi=video_url&contentplayhead=00:00:15.000")));
+        verify(mockRequestQueue).add(
+                argThat(isUrl("close?errorcode=&asseturi=video_url&contentplayhead=00:00:15.000")));
+        verifyNoMoreInteractions(mockRequestQueue);
     }
 
     @Test

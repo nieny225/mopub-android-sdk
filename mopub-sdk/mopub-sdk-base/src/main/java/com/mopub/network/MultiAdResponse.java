@@ -6,9 +6,10 @@ package com.mopub.network;
 
 
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.text.TextUtils;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.mopub.common.AdFormat;
 import com.mopub.common.AdType;
@@ -41,6 +42,7 @@ import static com.mopub.common.logging.MoPubLog.AdLogEvent.RESPONSE_RECEIVED;
 import static com.mopub.network.HeaderUtils.extractBooleanHeader;
 import static com.mopub.network.HeaderUtils.extractHeader;
 import static com.mopub.network.HeaderUtils.extractIntegerHeader;
+import static com.mopub.network.HeaderUtils.extractJsonObjectHeader;
 import static com.mopub.network.HeaderUtils.extractPercentHeaderString;
 import static com.mopub.network.HeaderUtils.extractStringArray;
 
@@ -54,6 +56,7 @@ public class MultiAdResponse implements Iterator<AdResponse> {
         void onInvalidateConsent(@Nullable final String consentChangeReason);
         void onReacquireConsent(@Nullable final String consentChangeReason);
         void onForceGdprApplies();
+        void onRequestSuccess(@Nullable final String adUnitId);
     }
 
     @NonNull
@@ -88,6 +91,7 @@ public class MultiAdResponse implements Iterator<AdResponse> {
 
         JSONObject jsonObject = new JSONObject(responseBody);
         mFailUrl = jsonObject.optString(ResponseHeader.FAIL_URL.getKey());
+        final String adUnitFormat = jsonObject.optString(ResponseHeader.ADUNIT_FORMAT.getKey());
         String requestId = jsonObject.optString(ResponseHeader.REQUEST_ID.getKey());
 
         final Integer backoffMs = extractIntegerHeader(jsonObject, ResponseHeader.BACKOFF_MS);
@@ -115,6 +119,7 @@ public class MultiAdResponse implements Iterator<AdResponse> {
             } else if (reacquireConsent) {
                 sServerOverrideListener.onReacquireConsent(consentChangeReason);
             }
+            sServerOverrideListener.onRequestSuccess(adUnitId);
         }
 
         final boolean enableDebugLogging = extractBooleanHeader(jsonObject,
@@ -131,7 +136,13 @@ public class MultiAdResponse implements Iterator<AdResponse> {
         for (int i = 0; i < adResponses.length(); i++) {
             try {
                 JSONObject item = adResponses.getJSONObject(i);
-                AdResponse singleAdResponse = parseSingleAdResponse(appContext, networkResponse, item, adUnitId, adFormat, requestId);
+                AdResponse singleAdResponse = parseSingleAdResponse(appContext,
+                        networkResponse,
+                        item,
+                        adUnitId,
+                        adFormat,
+                        adUnitFormat,
+                        requestId);
                 if (!AdType.CLEAR.equals(singleAdResponse.getAdType())) {
                     list.add(singleAdResponse);
                     continue;
@@ -213,11 +224,13 @@ public class MultiAdResponse implements Iterator<AdResponse> {
                                                       @NonNull final JSONObject jsonObject,
                                                       @Nullable final String adUnitId,
                                                       @NonNull final AdFormat adFormat,
+                                                      @NonNull final String adUnitFormat,
                                                       @Nullable final String requestId) throws JSONException, MoPubNetworkError {
         Preconditions.checkNotNull(appContext);
         Preconditions.checkNotNull(networkResponse);
         Preconditions.checkNotNull(jsonObject);
         Preconditions.checkNotNull(adFormat);
+        Preconditions.checkNotNull(adUnitFormat);
 
         MoPubLog.log(RESPONSE_RECEIVED, jsonObject.toString());
 
@@ -249,6 +262,9 @@ public class MultiAdResponse implements Iterator<AdResponse> {
 
         String networkType = extractHeader(jsonHeaders, ResponseHeader.NETWORK_TYPE);
         builder.setNetworkType(networkType);
+
+        JSONObject impressionJson = extractJsonObjectHeader(jsonHeaders, ResponseHeader.IMPRESSION_DATA);
+        builder.setImpressionData(ImpressionData.create(impressionJson));
 
         // X-Clickthrough is parsed into the AdResponse as the click tracker
         // Used by AdViewController, Rewarded Video, Native Adapter, MoPubNative
@@ -320,7 +336,7 @@ public class MultiAdResponse implements Iterator<AdResponse> {
         // Process server extras if they are present:
         String customEventData = extractHeader(jsonHeaders, ResponseHeader.CUSTOM_EVENT_DATA);
 
-        // Some server-supported custom events (like Millennial banners) use a different header field
+        // Some server-supported custom events (like AdMob banners) use a different header field
         if (TextUtils.isEmpty(customEventData)) {
             customEventData = extractHeader(jsonHeaders, ResponseHeader.NATIVE_PARAMS);
         }
@@ -347,6 +363,9 @@ public class MultiAdResponse implements Iterator<AdResponse> {
             // Used by Banner, Interstitial
             serverExtras.put(DataKeys.CLICKTHROUGH_URL_KEY, clickTrackingUrl);
         }
+
+        serverExtras.put(DataKeys.ADUNIT_FORMAT, adUnitFormat);
+
         if (eventDataIsInResponseBody(adTypeString, fullAdTypeString)) {
             // Some MoPub-specific custom events get their serverExtras from the response itself:
             serverExtras.put(DataKeys.HTML_RESPONSE_BODY_KEY, content);
