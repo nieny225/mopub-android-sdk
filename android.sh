@@ -1,4 +1,8 @@
 #! /bin/bash
+# Copyright 2018-2020 Twitter, Inc.
+# Licensed under the MoPub SDK License Agreement
+# http://www.mopub.com/legal/sdk-license-agreement/
+
 
 # Run with: [mopub-android]$ chmod +x android.sh && ./android.sh
 sdk_manager_dir="$HOME/Library/Android/sdk/tools/bin"
@@ -55,9 +59,11 @@ cd $adb_dir
 ./adb push $mopub_sample_dir/build/outputs/apk/androidTest/external/debug/mopub-sample-external-debug-androidTest.apk /data/local/tmp/com.mopub.simpleadsdemo.test
 ./adb shell pm install -g -t -r "/data/local/tmp/com.mopub.simpleadsdemo.test"
 
-# Enable fullscreen mode & Run All Tests:
-echo "Test run starts"
+# Enable fullscreen mode:
 ./adb shell settings put global policy_control immersive.full=com.mopub.simpleadsdemo
+
+# Run All Tests
+echo "Test run starts"
 test_report=$(./adb shell am instrument -w -r   -e package com.mopub.tests -e debug false com.mopub.simpleadsdemo.test/androidx.test.runner.AndroidJUnitRunner)
 
 # Show test report

@@ -1,17 +1,17 @@
-// Copyright 2018-2019 Twitter, Inc.
+// Copyright 2018-2020 Twitter, Inc.
 // Licensed under the MoPub SDK License Agreement
 // http://www.mopub.com/legal/sdk-license-agreement/
 
 package com.mopub.simpleadsdemo;
 
 import android.app.Activity;
-import android.location.Location;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
@@ -54,26 +54,7 @@ public class NativeGalleryFragment extends Fragment implements MoPubNativeAdLoad
         views.mLoadButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // If your app already has location access, include it here.
-                final Location location = null;
-                final String keywords = views.mKeywordsField.getText().toString();
-                final String userDataKeywords = views.mUserDataKeywordsField.getText().toString();
-
-                // Setting desired assets on your request helps native ad networks and bidders
-                // provide higher-quality ads.
-                final EnumSet<NativeAdAsset> desiredAssets = EnumSet.of(
-                        NativeAdAsset.TITLE,
-                        NativeAdAsset.TEXT,
-                        NativeAdAsset.ICON_IMAGE,
-                        NativeAdAsset.MAIN_IMAGE,
-                        NativeAdAsset.CALL_TO_ACTION_TEXT);
-
-                mRequestParameters = new RequestParameters.Builder()
-                        .location(location)
-                        .keywords(keywords)
-                        .userDataKeywords(userDataKeywords)
-                        .desiredAssets(desiredAssets)
-                        .build();
+                updateRequestParameters(views);
 
                 if (mStreamAdPlacer != null) {
                     mStreamAdPlacer.loadAds(mAdConfiguration.getAdUnitId(), mRequestParameters);
@@ -87,6 +68,7 @@ public class NativeGalleryFragment extends Fragment implements MoPubNativeAdLoad
         views.mKeywordsField.setText(getArguments().getString(MoPubListFragment.KEYWORDS_KEY, ""));
         views.mUserDataKeywordsField.setText(getArguments().getString(MoPubListFragment.USER_DATA_KEYWORDS_KEY, ""));
         mViewPager = (ViewPager) view.findViewById(R.id.gallery_pager);
+        updateRequestParameters(views);
 
         // Set up a renderer for a static native ad.
         final MoPubStaticNativeAdRenderer moPubStaticNativeAdRenderer = new MoPubStaticNativeAdRenderer(
@@ -97,6 +79,7 @@ public class NativeGalleryFragment extends Fragment implements MoPubNativeAdLoad
                         .iconImageId(R.id.native_icon_image)
                         .callToActionId(R.id.native_cta)
                         .privacyInformationIconImageId(R.id.native_privacy_information_icon_image)
+                        .sponsoredTextId(R.id.native_sponsored_text_view)
                         .build()
         );
 
@@ -109,6 +92,7 @@ public class NativeGalleryFragment extends Fragment implements MoPubNativeAdLoad
                         .iconImageId(R.id.native_icon_image)
                         .callToActionId(R.id.native_cta)
                         .privacyInformationIconImageId(R.id.native_privacy_information_icon_image)
+                        .sponsoredTextId(R.id.native_sponsored_text_view)
                         .build());
 
         // Set up a renderer for Facebook video ads.
@@ -186,6 +170,27 @@ public class NativeGalleryFragment extends Fragment implements MoPubNativeAdLoad
 
     public MoPubStreamAdPlacer getAdPlacer() {
         return mStreamAdPlacer;
+    }
+
+    private void updateRequestParameters(@NonNull final DetailFragmentViewHolder views) {
+        final String keywords = views.mKeywordsField.getText().toString();
+        final String userDataKeywords = views.mUserDataKeywordsField.getText().toString();
+
+        // Setting desired assets on your request helps native ad networks and bidders
+        // provide higher-quality ads.
+        final EnumSet<NativeAdAsset> desiredAssets = EnumSet.of(
+                NativeAdAsset.TITLE,
+                NativeAdAsset.TEXT,
+                NativeAdAsset.ICON_IMAGE,
+                NativeAdAsset.MAIN_IMAGE,
+                NativeAdAsset.CALL_TO_ACTION_TEXT,
+                NativeAdAsset.SPONSORED);
+
+        mRequestParameters = new RequestParameters.Builder()
+                .keywords(keywords)
+                .userDataKeywords(userDataKeywords)
+                .desiredAssets(desiredAssets)
+                .build();
     }
 
     @Override

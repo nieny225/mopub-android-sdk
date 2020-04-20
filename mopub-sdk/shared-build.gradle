@@ -1,8 +1,10 @@
-// Copyright 2018-2019 Twitter, Inc.
+// Copyright 2018-2020 Twitter, Inc.
 // Licensed under the MoPub SDK License Agreement
 // http://www.mopub.com/legal/sdk-license-agreement/
 
 apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
 
 repositories {
     google()
@@ -14,16 +16,16 @@ repositories {
 }
 
 project.group = 'com.mopub'
-project.version = '5.10.0'
+project.version = '5.11.1'
 
 android {
     compileSdkVersion 29
     lintOptions { abortOnError false }
 
     defaultConfig {
-        versionCode 75
+        versionCode 78
         versionName version
-        minSdkVersion 16
+        minSdkVersion 19
         targetSdkVersion 29
         consumerProguardFiles project(':mopub-sdk').file('proguard.txt')
     }
@@ -80,5 +82,18 @@ android {
 dependencies {
     api 'androidx.legacy:legacy-support-v4:1.0.0'
     api 'androidx.annotation:annotation:1.1.0'
+    api "androidx.media2:media2-session:$media2_version"
+    api "androidx.media2:media2-widget:$media2_version"
+    api "androidx.media2:media2-player:$media2_version"
+
+    implementation "androidx.core:core-ktx:1.1.0"
     implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'com.google.code.gson:gson:2.8.6'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+}
+
+apply plugin: 'kotlin-allopen'
+
+allOpen {
+    annotation('com.mopub.mobileads.Mockable')
 }

@@ -1,4 +1,4 @@
-// Copyright 2018-2019 Twitter, Inc.
+// Copyright 2018-2020 Twitter, Inc.
 // Licensed under the MoPub SDK License Agreement
 // http://www.mopub.com/legal/sdk-license-agreement/
 
@@ -363,6 +363,15 @@ public class MultiAdResponse implements Iterator<AdResponse> {
             // Used by Banner, Interstitial
             serverExtras.put(DataKeys.CLICKTHROUGH_URL_KEY, clickTrackingUrl);
         }
+
+        // Flag for immediate VAST clickability
+        // Enable the experiment on a value of 1
+        // Disable the experiment for everything else
+        final int shouldEnableVastClickInt = extractIntegerHeader(jsonHeaders,
+                ResponseHeader.VAST_CLICK_ENABLED,
+                0);
+        serverExtras.put(DataKeys.VAST_CLICK_EXP_ENABLED_KEY,
+                Boolean.toString(shouldEnableVastClickInt == 1));
 
         serverExtras.put(DataKeys.ADUNIT_FORMAT, adUnitFormat);
 
