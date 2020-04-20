@@ -87,6 +87,9 @@ android {
 }
 
 dependencies {
+    implementation('com.mopub:mopub-sdk:5.10.0@aar') {
+        transitive = true
+    }
     // Third party Custom Network Adapters
     implementation 'com.adcolony:sdk:4.1.0'
     implementation 'com.google.android.gms:play-services-ads:18.2.0'
@@ -123,15 +126,15 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
     implementation 'com.google.android.gms:play-services-ads-identifier:17.0.0'
     implementation 'com.google.android.gms:play-services-base:17.1.0'
-    implementation project(':mopub-sdk')
+//    implementation project(':mopub-sdk')
 
 // AdColony
     implementation 'com.adcolony:sdk:3.3.8'
     implementation 'com.mopub.mediation:adcolony:3.3.8.1'
 
 // Facebook Audience Network
-    implementation 'com.facebook.android:audience-network-sdk:5.2.0'
-    implementation 'com.mopub.mediation:facebookaudiencenetwork:5.2.0.1'
+    implementation 'com.facebook.android:audience-network-sdk:5.8.0'
+    implementation 'com.mopub.mediation:facebookaudiencenetwork:5.8.0.1'
 
 // Tapjoy
     implementation 'com.tapjoy:tapjoy-android-sdk:12.2.0@aar'
